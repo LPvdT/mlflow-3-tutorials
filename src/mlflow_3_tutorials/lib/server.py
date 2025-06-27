@@ -6,9 +6,7 @@ from loguru import logger
 from mlflow_3_tutorials.constants import (
     SERVER_ADDRESS,
     SERVER_PORT,
-    TRACKING_PORT,
     TRACKING_URI,
-    TRACKING_URL,
 )
 
 
