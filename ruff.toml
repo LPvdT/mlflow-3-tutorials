@@ -27,6 +27,7 @@ select = [
 ]
 ignore = [
     "B008", # function call in argument defaults
+    "E501", # line too long
 ]
 line-length = 80
 fixable = [
