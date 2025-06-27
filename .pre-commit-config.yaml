@@ -1,0 +1,38 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        name: Trailing Whitespace
+
+      - id: end-of-file-fixer
+        name: End of Line Fixer
+
+      - id: check-yaml
+        name: Check YAML
+
+      - id: check-json
+        name: Check JSON
+
+      - id: check-toml
+        name: Check TOML
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.12.1
+    hooks:
+      - id: ruff-check
+        name: Ruff Check
+        types_or: [python, pyi]
+        args: [--fix, --config=ruff.toml, --exit-zero, --unsafe-fixes, .]
+
+      - id: ruff-format
+        name: Ruff Format
+        types_or: [python, pyi]
+        args: [--config=ruff.toml, .]
+
+  - repo: https://github.com/lyz-code/yamlfix
+    rev: 1.17.0
+    hooks:
+      - id: yamlfix
+        name: YAML Fix
+        args: [--config-file=yamlfix.toml]
