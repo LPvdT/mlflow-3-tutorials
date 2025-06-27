@@ -1,6 +1,7 @@
 target-version = "py312"
 
 select = [
+    "ALL",  # All rules
     "F",    # pyflakes
     "E",    # pycodestyle errors
     "W",    # pycodestyle warnings
@@ -26,6 +27,7 @@ select = [
     "F401", # unused imports (redundant if already in F, but for clarity)
 ]
 ignore = [
+    "D",
     "B008", # function call in argument defaults
     "E501", # line too long
 ]
