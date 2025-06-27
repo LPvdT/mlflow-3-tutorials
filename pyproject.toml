@@ -14,7 +14,7 @@ dependencies = [
 
 [project.scripts]
 main = "mlflow_3_tutorials:main.main"
-server = "mlflow_3_tutorials:lib.server.start_tracking_server"
+server = "mlflow_3_tutorials.lib.server:start_tracking_server"
 
 [dependency-groups]
 dev = [
