@@ -32,7 +32,7 @@ ignore = [
     "E501", # line too long
     "S603", # subprocess starting a process with a partial executable path
     "S607", #Starting a process with a partial executable path
-
+    "S604",
 ]
 line-length = 80
 fixable = [
