@@ -23,18 +23,16 @@ repos:
       - id: ruff-check
         name: Ruff Check
         types_or: [python, pyi]
-        args:
-          ['--fix', '--config=ruff.toml', '--exit-zero', '--unsafe-fixes', '.']
+        args: [--fix, --config=ruff.toml, --exit-zero, --unsafe-fixes, .]
 
       - id: ruff-format
         name: Ruff Format
         types_or: [python, pyi]
-        args: ['--config=ruff.toml', '.']
+        args: [--config=ruff.toml, .]
 
   - repo: https://github.com/lyz-code/yamlfix
     rev: 1.17.0
     hooks:
       - id: yamlfix
         name: YAML Fix
-        args:
-          - '--config-file=yamlfix.toml'
+        args: [--config-file=yamlfix.toml]
