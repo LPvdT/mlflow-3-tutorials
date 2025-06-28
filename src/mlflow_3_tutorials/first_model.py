@@ -1,6 +1,6 @@
 from loguru import logger
 from mlflow import MlflowClient
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.ensemble import RandomForestRegressor  # noqa
 
 from mlflow_3_tutorials.lib.constants import TRACKING_URI
 from mlflow_3_tutorials.lib.utils import as_json
