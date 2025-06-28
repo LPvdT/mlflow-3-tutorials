@@ -41,6 +41,7 @@ line-length = 80
 fixable = [
     "ALL",
 ]
+unsafe-fixes = true
 
 exclude = [
     ".git",
