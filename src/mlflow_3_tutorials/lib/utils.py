@@ -56,14 +56,12 @@ def generate_apple_sales_data_with_promo_adjustment(
     An inflation multiplier is applied to simulate inflation over time.
 
     Parameters:
-    base_demand (int): The base demand for apples without any adjustments.
-    n_rows (int): The number of rows (days) to generate data for.
+        base_demand (int): The base demand for apples without any adjustments.
+        n_rows (int): The number of rows (days) to generate data for.
 
     Returns:
-    pd.DataFrame: A DataFrame containing the generated apple sales data with columns for
-                  date, average temperature, rainfall, weekend, holiday, price per kg,
-                  promo, demand, and previous day's demand. The columns for inflation
-                  multiplier, harvest effect, and month are removed from the final output.
+        pd.DataFrame:
+        A DataFrame containing the generated apple sales data with columns for date, average temperature, rainfall, weekend, holiday, price per kg, promo, demand, and previous day's demand. The columns for inflation multiplier, harvest effect, and month are removed from the final output.
     """
 
     rng = np.random.default_rng(9999)
