@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
 from typing import Any
+from venv import logger
 
 import numpy as np
 import pandas as pd
@@ -17,9 +18,9 @@ def as_json(obj: Any) -> str:  # noqa
             else x,
         )
     except json.JSONDecodeError as e:
-        raise ValueError(  # noqa
-            f"Object {obj} cannot be serialized to JSON: {e!s}"  # noqa
-        ) from e
+        msg = f"Object {obj} cannot be serialized to JSON: {e!s}"
+        logger.error(msg)
+        raise ValueError(msg) from e
     else:
         return payload
 
