@@ -9,7 +9,13 @@ import pytz
 
 def as_json(obj: Any) -> str:  # noqa
     try:
-        payload = json.dumps(obj, indent=2)
+        payload = json.dumps(
+            obj,
+            indent=2,
+            default=lambda x: x.isoformat()
+            if isinstance(x, pd.Timestamp)
+            else x,
+        )
     except json.JSONDecodeError as e:
         raise ValueError(  # noqa
             f"Object {obj} cannot be serialized to JSON: {e!s}"  # noqa
