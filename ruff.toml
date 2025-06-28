@@ -31,6 +31,7 @@ lint.select = [
 
 lint.ignore = [
     "D",   # pydocstyle
+    "DOC", # pydoclint
     "TD",  # Author TODO
     "CPY", # Flake8-copyright
 ]
