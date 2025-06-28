@@ -13,6 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
+sync = "mlflow_3_tutorials.lib.server:uv_sync"
 server = "mlflow_3_tutorials.lib.server:start_tracking_server"
 first_model = "mlflow_3_tutorials.first_model:main"
 
