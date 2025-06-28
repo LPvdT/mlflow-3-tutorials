@@ -11,11 +11,25 @@ from .constants import (
 
 
 def configure_tracking_server() -> None:
+    """
+    Configure MLflow to use the MLflow tracking server running on
+    http://{SERVER_ADDRESS}:{SERVER_PORT}.
+
+    This function sets the MLflow tracking URI to
+    http://{SERVER_ADDRESS}:{SERVER_PORT} and logs the result.
+    """
+
     logger.info(f"Setting MLflow tracking URI to: {TRACKING_URI}")
     mlflow.set_tracking_uri(TRACKING_URI)
 
 
 def start_tracking_server() -> None:
+    """
+    Start an MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}.
+
+    This function will block until the MLflow tracking server is stopped.
+    """
+
     logger.info(
         f"Starting MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}...",
     )
@@ -40,6 +54,15 @@ def start_tracking_server() -> None:
 
 
 def uv_sync() -> None:
+    """
+    Execute the 'uv sync' command to synchronize all groups and compile bytecode.
+
+    This function runs the 'uv sync --managed-python --all-groups --compile-bytecode'
+    command to synchronize the environment and compile bytecode for all groups.
+    It captures the command's output and logs any exceptions or interruptions
+    that occur during its execution.
+    """
+
     logger.info(
         "Running 'uv sync --managed-python --all-groups --compile-bytecode'...",
     )
@@ -61,4 +84,36 @@ def uv_sync() -> None:
         raise
     except KeyboardInterrupt:
         logger.warning("'uv sync' interrupted.")
+        return
+
+
+def run_pyment() -> None:
+    """
+    Execute the 'pyment' command to run the Python code in the current directory.
+
+    This function runs the 'pyment' command to run the Python code in the
+    current directory. It captures the command's output and logs any exceptions
+    or interruptions that occur during its execution.
+    """
+
+    logger.info("Running 'pyment'...")
+    try:
+        _ = subprocess.run(
+            [
+                "pyment",
+                "-f",
+                "false",
+                "-o",
+                "google",
+                ".",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception as e:
+        logger.error(f"Failed to run 'pyment': {e!s}")
+        raise
+    except KeyboardInterrupt:
+        logger.warning("'pyment' interrupted.")
         return

@@ -9,6 +9,10 @@ import pytz
 
 
 def as_json(obj: Any) -> str:  # noqa
+    """
+    Serializes a given object to a JSON formatted string.
+    """
+
     try:
         payload = json.dumps(
             obj,
@@ -29,6 +33,16 @@ def generate_apple_sales_data_with_promo_adjustment(
     base_demand: int = 1000,
     n_rows: int = 5000,
 ) -> pd.DataFrame:
+    """
+    Generates a DataFrame containing synthetic apple sales data with promotional adjustments.
+
+    The function simulates apple sales data for a specified number of days, generating
+    features such as average temperature, rainfall, weekend indicator, holiday indicator,
+    price per kg, and promotional activity. The demand for apples is adjusted based on
+    various factors including base price, seasonality, promotions, and weekend effects.
+    An inflation multiplier is applied to simulate inflation over time.
+    """
+
     rng = np.random.default_rng(9999)
 
     # Create date range
