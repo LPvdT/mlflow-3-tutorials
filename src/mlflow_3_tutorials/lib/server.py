@@ -3,7 +3,7 @@ import subprocess
 import mlflow
 from loguru import logger
 
-from mlflow_3_tutorials.constants import (
+from .constants import (
     SERVER_ADDRESS,
     SERVER_PORT,
     TRACKING_URI,
