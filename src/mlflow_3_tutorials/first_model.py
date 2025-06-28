@@ -3,7 +3,10 @@ from mlflow import MlflowClient
 from sklearn.ensemble import RandomForestRegressor  # noqa
 
 from mlflow_3_tutorials.lib.constants import TRACKING_URI
-from mlflow_3_tutorials.lib.utils import as_json
+from mlflow_3_tutorials.lib.utils import (
+    as_json,
+    generate_apple_sales_data_with_promo_adjustment,
+)
 
 
 def main() -> None:
@@ -48,3 +51,6 @@ def main() -> None:
     )
 
     logger.info(f"apples_experiment: {as_json(vars(apples_experiment[0]))}")
+
+    data = generate_apple_sales_data_with_promo_adjustment(1_000, 5_000)
+    logger.info(f"data: {as_json(data.sample(3).to_dict(orient='records'))}")
