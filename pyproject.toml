@@ -10,13 +10,17 @@ requires-python = ">=3.12"
 dependencies = [
     "loguru>=0.7.3",
     "mlflow>=3.1.1",
+    "scikit-learn>=1.7.0",
 ]
 
 [project.scripts]
-main = "mlflow_3_tutorials:main.main"
+sync = "mlflow_3_tutorials.lib.scripts:uv_sync"
+server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
+first_model = "mlflow_3_tutorials.first_model:main"
 
 [dependency-groups]
 dev = [
+    "basedpyright>=1.29.4",
     "ipykernel>=6.29.5",
     "ipywidgets>=8.1.7",
     "mccabe>=0.7.0",

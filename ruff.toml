@@ -1,6 +1,9 @@
 target-version = "py312"
+line-length = 80
+unsafe-fixes = true
 
-select = [
+lint.select = [
+    "ALL",  # All rules
     "F",    # pyflakes
     "E",    # pycodestyle errors
     "W",    # pycodestyle warnings
@@ -25,16 +28,28 @@ select = [
     "RUF",  # Ruff-specific rules
     "F401", # unused imports (redundant if already in F, but for clarity)
 ]
-ignore = [
-    "B008", # function call in argument defaults
-    "E501", # line too long
+
+lint.ignore = [
+    "D",   # pydocstyle
+    "TD",  # Author TODO
+    "CPY", # Flake8-copyright
 ]
-line-length = 80
-fixable = [
+
+lint.extend-ignore = [
+    "FIX002", # Resolve TODO
+    "B008",   # function call in argument defaults
+    "E501",   # line too long
+    "S603",   # subprocess starting a process with a partial executable path
+    "S607",   # Starting a process with a partial executable path
+    "S404",   # Subprocess
+    "PGH004", # Use specific rule codes when using `noqa`
+]
+
+lint.fixable = [
     "ALL",
 ]
 
-exclude = [
+lint.exclude = [
     ".git",
     "__pycache__",
     "build",
@@ -44,12 +59,12 @@ exclude = [
     "migrations",
 ]
 
-[per-file-ignores]
-"tests/*" = [
-    "S101",
-] # Allow assert statements in tests
+[lint.per-file-ignores]
+"**/tests/*" = [
+    "S101", # Allow assert statements in tests
+]
 
-[mccabe]
+[lint.mccabe]
 max-complexity = 10
 
 [format]
