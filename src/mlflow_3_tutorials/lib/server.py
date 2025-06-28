@@ -37,3 +37,28 @@ def start_tracking_server() -> None:
     except KeyboardInterrupt:
         logger.warning("MLflow tracking server shutdown.")
         return
+
+
+def uv_sync() -> None:
+    logger.info(
+        "Running 'uv sync --managed-python --all-groups --compile-bytecode'...",
+    )
+    try:
+        _ = subprocess.run(
+            [
+                "uv",
+                "sync",
+                "--managed-python",
+                "--all-groups",
+                "--compile-bytecode",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception as e:
+        logger.error(f"Failed to run 'uv sync': {e!s}")
+        raise
+    except KeyboardInterrupt:
+        logger.warning("'uv sync' interrupted.")
+        return
