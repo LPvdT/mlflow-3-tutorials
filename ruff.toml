@@ -43,6 +43,8 @@ lint.extend-ignore = [
     "S607",   # Starting a process with a partial executable path
     "S404",   # Subprocess
     "PGH004", # Use specific rule codes when using `noqa`
+    "PGH003", # Use specific rule codes when using `type: ignore`
+    "N806",   # Variable name should be lowercase
 ]
 
 lint.fixable = [
