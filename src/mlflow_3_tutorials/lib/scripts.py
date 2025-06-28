@@ -1,5 +1,4 @@
 import subprocess
-from pathlib import Path
 
 import mlflow
 from loguru import logger
@@ -97,12 +96,17 @@ def run_pyment() -> None:
     or interruptions that occur during its execution.
     """
 
-    target_dir = Path().cwd().parent.resolve().as_posix()
-
     logger.info("Running 'pyment'...")
     try:
         _ = subprocess.run(
-            ["pyment", "-f", "false", "-o", "google", target_dir],
+            [
+                "pyment",
+                "-f",
+                "false",
+                "-o",
+                "google",
+                ".",
+            ],
             capture_output=True,
             text=True,
             check=False,
