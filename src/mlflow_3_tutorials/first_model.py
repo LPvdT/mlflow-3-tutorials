@@ -38,7 +38,7 @@ def main() -> None:
         "mlflow.note.content": experiment_description,
     }
 
-    produce_apples_experiment = client.create_experiment(
+    _produce_apples_experiment = client.create_experiment(
         name="produce-apples",
         tags=experiment_tags,
     )
