@@ -17,8 +17,6 @@ def configure_tracking_server() -> None:
 
     This function sets the MLflow tracking URI to
     http://{SERVER_ADDRESS}:{SERVER_PORT} and logs the result.
-
-    :return: None
     """
 
     logger.info(f"Setting MLflow tracking URI to: {TRACKING_URI}")
@@ -30,8 +28,6 @@ def start_tracking_server() -> None:
     Start an MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}.
 
     This function will block until the MLflow tracking server is stopped.
-
-    :return: None
     """
 
     logger.info(
@@ -65,8 +61,6 @@ def uv_sync() -> None:
     command to synchronize the environment and compile bytecode for all groups.
     It captures the command's output and logs any exceptions or interruptions
     that occur during its execution.
-
-    :return: None
     """
 
     logger.info(
