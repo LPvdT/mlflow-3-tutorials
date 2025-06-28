@@ -2,8 +2,8 @@ import logging
 from typing import Final
 
 # URL and port for the MLflow tracking server.
-TRACKING_URL: Final[str] = "http://localhost"
-TRACKING_PORT: Final[int] = 5000
+TRACKING_URL: Final[str] = "http://127.0.0.1"
+TRACKING_PORT: Final[int] = 8080
 
 # The tracking URI for MLflow, which is the URL and port where the MLflow server is running.
 TRACKING_URI: Final[str] = f"{TRACKING_URL}:{TRACKING_PORT}"
