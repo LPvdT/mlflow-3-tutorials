@@ -1,6 +1,6 @@
 target-version = "py312"
 
-select = [
+lint.select = [
     "ALL",  # All rules
     "F",    # pyflakes
     "E",    # pycodestyle errors
@@ -26,7 +26,7 @@ select = [
     "RUF",  # Ruff-specific rules
     "F401", # unused imports (redundant if already in F, but for clarity)
 ]
-ignore = [
+lint.ignore = [
     "D",
     "B008",   # function call in argument defaults
     "E501",   # line too long
@@ -42,7 +42,7 @@ fixable = [
 ]
 unsafe-fixes = true
 
-exclude = [
+lint.exclude = [
     ".git",
     "__pycache__",
     "build",
@@ -52,12 +52,12 @@ exclude = [
     "migrations",
 ]
 
-[per-file-ignores]
+[lint.per-file-ignores]
 "**/tests/*" = [
     "S101",
 ] # Allow assert statements in tests
 
-[mccabe]
+[lint.mccabe]
 max-complexity = 10
 
 [format]
