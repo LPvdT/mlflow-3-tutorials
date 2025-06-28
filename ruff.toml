@@ -28,13 +28,14 @@ select = [
 ]
 ignore = [
     "D",
-    "B008", # function call in argument defaults
-    "E501", # line too long
-    "S603", # subprocess starting a process with a partial executable path
-    "S101", # assert statements
-    "S607", # Starting a process with a partial executable path
-    "S404", # Subprocess
-    "CPY",  # Flake8-copyright
+    "B008",   # function call in argument defaults
+    "E501",   # line too long
+    "S603",   # subprocess starting a process with a partial executable path
+    "S101",   # assert statements
+    "S607",   # Starting a process with a partial executable path
+    "S404",   # Subprocess
+    "CPY",    # Flake8-copyright
+    "PGH004", # Use specific rule codes when using `noqa`
 ]
 line-length = 80
 fixable = [
