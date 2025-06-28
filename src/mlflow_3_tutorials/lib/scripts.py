@@ -1,4 +1,5 @@
 import subprocess
+from pathlib import Path
 
 import mlflow
 from loguru import logger
@@ -84,4 +85,31 @@ def uv_sync() -> None:
         raise
     except KeyboardInterrupt:
         logger.warning("'uv sync' interrupted.")
+        return
+
+
+def run_pyment() -> None:
+    """
+    Execute the 'pyment' command to run the Python code in the current directory.
+
+    This function runs the 'pyment' command to run the Python code in the
+    current directory. It captures the command's output and logs any exceptions
+    or interruptions that occur during its execution.
+    """
+
+    target_dir = Path().cwd().parent.resolve().as_posix()
+
+    logger.info("Running 'pyment'...")
+    try:
+        _ = subprocess.run(
+            ["pyment", "-f", "false", "-o", "google", target_dir],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+    except Exception as e:
+        logger.error(f"Failed to run 'pyment': {e!s}")
+        raise
+    except KeyboardInterrupt:
+        logger.warning("'pyment' interrupted.")
         return

@@ -16,6 +16,7 @@ dependencies = [
 [project.scripts]
 sync = "mlflow_3_tutorials.lib.scripts:uv_sync"
 server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
+pyment = "mlflow_3_tutorials.lib.scripts:run_pyment"
 first_model = "mlflow_3_tutorials.first_model:main"
 
 [dependency-groups]
