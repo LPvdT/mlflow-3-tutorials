@@ -914,6 +914,7 @@ source = { editable = "." }
 dependencies = [
     { name = "loguru" },
     { name = "mlflow" },
+    { name = "scikit-learn" },
 ]
 
 [package.dev-dependencies]
@@ -932,6 +933,7 @@ test = [
 requires-dist = [
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mlflow", specifier = ">=3.1.1" },
+    { name = "scikit-learn", specifier = ">=1.7.0" },
 ]
 
 [package.metadata.requires-dev]
