@@ -31,17 +31,15 @@ def start_tracking_server() -> None:
     This function will block until the MLflow tracking server is stopped.
     """
 
-    logger.info(
-        f"Starting MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}...",
-    )
+    cmd_name = f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}"
+    cmd = shlex.split(cmd_name)
+
     try:
+        logger.info(
+            f"Starting MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}...",
+        )
         _ = subprocess.run(
-            [
-                "mlflow",
-                "server",
-                f"--host={SERVER_ADDRESS}",
-                f"--port={SERVER_PORT}",
-            ],
+            cmd,
             capture_output=True,
             text=True,
             check=False,
@@ -64,18 +62,13 @@ def uv_sync() -> None:
     that occur during its execution.
     """
 
-    logger.info(
-        "Running 'uv sync --managed-python --all-groups --compile-bytecode'...",
-    )
+    cmd_name = "uv sync --managed-python --all-groups --compile-bytecode"
+    cmd = shlex.split(cmd_name)
+
     try:
+        logger.info(f"Running: '{cmd_name}'...")
         _ = subprocess.run(
-            [
-                "uv",
-                "sync",
-                "--managed-python",
-                "--all-groups",
-                "--compile-bytecode",
-            ],
+            cmd,
             capture_output=True,
             text=True,
             check=False,
@@ -101,14 +94,21 @@ def run_precommit() -> None:
     any exceptions or interruptions that occur during their execution.
     """
 
-    cmd_update = shlex.split("pre-commit autoupdate")
-    cmd_run = shlex.split("pre-commit run -a")
+    cmd_names = {
+        "update": "pre-commit autoupdate",
+        "run": "pre-commit run -a",
+    }
 
-    commands = [cmd_update, cmd_run]
+    cmd_update = shlex.split(cmd_names["update"])
+    cmd_run = shlex.split(cmd_names["run"])
 
-    for cmd in commands:
-        logger.info(f"Running {cmd}...")
+    for cmd_name, cmd in zip(
+        cmd_names.values(),
+        [cmd_update, cmd_run],
+        strict=True,
+    ):
         try:
+            logger.info(f"Running: '{cmd_name}'...")
             _ = subprocess.run(
                 cmd,
                 capture_output=True,
@@ -132,17 +132,13 @@ def run_pyment() -> None:
     or interruptions that occur during its execution.
     """
 
-    logger.info("Running 'pyment'...")
+    cmd_name = "pyment -f false -o google ."
+    cmd = shlex.split(cmd_name)
+
     try:
+        logger.info(f"Running: '{cmd_name}'...")
         _ = subprocess.run(
-            [
-                "pyment",
-                "-f",
-                "false",
-                "-o",
-                "google",
-                ".",
-            ],
+            cmd,
             capture_output=True,
             text=True,
             check=False,
