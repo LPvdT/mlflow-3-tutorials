@@ -1,3 +1,4 @@
+import shlex
 import subprocess
 
 import mlflow
@@ -85,6 +86,41 @@ def uv_sync() -> None:
     except KeyboardInterrupt:
         logger.warning("'uv sync' interrupted.")
         return
+
+
+def run_precommit() -> None:
+    """
+    Run pre-commit commands to update and execute all hooks.
+
+    This function executes two pre-commit commands:
+
+    1. 'pre-commit autoupdate' to update all hooks to the latest versions.
+    2. 'pre-commit run -a' to run all hooks against all files.
+
+    It captures the output of each command, logs the progress, and handles
+    any exceptions or interruptions that occur during their execution.
+    """
+
+    cmd_update = shlex.split("pre-commit autoupdate")
+    cmd_run = shlex.split("pre-commit run -a")
+
+    commands = [cmd_update, cmd_run]
+
+    for cmd in commands:
+        logger.info(f"Running {cmd}...")
+        try:
+            _ = subprocess.run(
+                cmd,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+        except Exception as e:
+            logger.error(f"Failed to run {cmd}: {e!s}")
+            raise
+        except KeyboardInterrupt:
+            logger.warning(f"{cmd} interrupted.")
+            return
 
 
 def run_pyment() -> None:
