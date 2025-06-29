@@ -1695,6 +1695,7 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "hyperopt" },
+    { name = "keras" },
     { name = "loguru" },
     { name = "mlflow", extra = ["extras"] },
     { name = "numpy" },
@@ -1720,6 +1721,7 @@ test = [
 [package.metadata]
 requires-dist = [
     { name = "hyperopt", specifier = ">=0.2.7" },
+    { name = "keras", specifier = ">=3.10.0" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mlflow", extras = ["extras"], specifier = ">=3.1.1" },
     { name = "numpy", specifier = ">=2.1.3" },
