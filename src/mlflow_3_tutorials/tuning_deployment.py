@@ -24,21 +24,9 @@ def as_ndarray_dtype(arr: object) -> NDArray[DType]:
 # Load data
 data = pd.read_csv(WINE_QUALITY_DATA_URL, sep=";")
 
-# Memory usage of `data`
-mem_mb = data.memory_usage(deep=True).sum() / 1024**2
-mem_gb = mem_mb / 1024
-logger.info(
-    f"Memory usage (data): {mem_mb:.2f} MB ({mem_gb:.2f} GB)",
-)
-
 # Create train/validation/test splits
 data_array = data.to_numpy()
-mem_mb = data_array.nbytes / 1024 / 1024
-logger.info(f"Memory usage (data_array): {mem_mb:.2f} MB")
-
-logger.warning("Deleting `data` from memory...")
 del data
-
 
 # Create train/validation/test splits
 train_x, test_x, train_y, test_y = train_test_split(
