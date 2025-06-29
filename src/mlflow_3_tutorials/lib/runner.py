@@ -9,6 +9,7 @@ def run_command(
     description: str | None = None,
     *,
     check: bool = True,
+    show_output: bool = False,
 ) -> None:
     """
     Run a shell command with logging and error handling.
@@ -30,6 +31,11 @@ def run_command(
             text=True,
             check=check,
         )
+
+        if show_output:
+            logger.info(f"stdout:\n{result.stdout.strip()}")
+            if err := result.stderr:
+                logger.warning(f"stderr:\n{err.strip()}")
 
         if check:
             _raise_called_process_error(result, cmd_str)
