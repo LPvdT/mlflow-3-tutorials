@@ -27,10 +27,11 @@ uv sync --managed-python --all-groups --compile-bytecode
 
 ### First MLflow Model
 
-- `first_model.py`: `uv run first_model`
-  - If you encounter and error that the experiment already exists, then delete (e.g.):
-    - `mlruns/142873212763357834` and/or `mlruns/665733959038238543`
-      - Actual IDs are different for you
+- `first_model.py`:
+  - Run: `uv run first_model`
+    - If you encounter an error that the experiment already exists, then delete it manually for now:
+      - `mlruns/142873212763357834` and/or `mlruns/665733959038238543`
+      > - Actual IDs are different for you
 
 ### Hyperparameter Tuning & Deployment
 
