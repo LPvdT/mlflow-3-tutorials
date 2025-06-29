@@ -1,14 +1,12 @@
-import shlex
-import subprocess
-
 import mlflow
 from loguru import logger
 
-from .constants import (
+from mlflow_3_tutorials.lib.constants import (
     SERVER_ADDRESS,
     SERVER_PORT,
     TRACKING_URI,
 )
+from mlflow_3_tutorials.lib.runner import run_command
 
 
 def configure_tracking_server() -> None:
@@ -28,124 +26,60 @@ def start_tracking_server() -> None:
     """
     Start an MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}.
 
-    This function will block until the MLflow tracking server is stopped.
+    This function runs the command `mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}` and logs the result.
     """
 
-    cmd_name = f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}"
-    cmd = shlex.split(cmd_name)
-
-    try:
-        logger.info(
-            f"Starting MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}...",
-        )
-        _ = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except Exception as e:
-        logger.error(f"Failed to start MLflow tracking server: {e!s}")
-        raise
-    except KeyboardInterrupt:
-        logger.warning("MLflow tracking server shutdown.")
-        return
+    run_command(
+        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}",
+        "MLflow tracking server",
+    )
 
 
 def uv_sync() -> None:
     """
-    Execute the 'uv sync' command to synchronize all groups and compile bytecode.
+    Run the command `uv sync --managed-python --all-groups --compile-bytecode`
+    to install the project's dependencies and compile bytecode.
 
-    This function runs the 'uv sync --managed-python --all-groups --compile-bytecode'
-    command to synchronize the environment and compile bytecode for all groups.
-    It captures the command's output and logs any exceptions or interruptions
-    that occur during its execution.
+    This function logs the result of the command.
     """
 
-    cmd_name = "uv sync --managed-python --all-groups --compile-bytecode"
-    cmd = shlex.split(cmd_name)
+    run_command(
+        "uv sync --managed-python --all-groups --compile-bytecode",
+        "uv sync",
+    )
 
-    try:
-        logger.info(f"Running: '{cmd_name}'...")
-        _ = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except Exception as e:
-        logger.error(f"Failed to run 'uv sync': {e!s}")
-        raise
-    except KeyboardInterrupt:
-        logger.warning("'uv sync' interrupted.")
-        return
+
+def run_pyment(style: str = "google") -> None:
+    """
+    Run the `pyment` docstring formatter with the specified style.
+
+    This function logs the result of the command.
+
+    Args:
+        style (str): The docstring style to format with, defaults to 'google'.
+    """
+
+    run_command(
+        f"pyment -f false -o {style} .",
+        "pyment docstring formatter",
+    )
 
 
 def run_precommit() -> None:
     """
-    Run pre-commit commands to update and execute all hooks.
+    Run the `pre-commit` hooks for the project.
 
-    This function executes two pre-commit commands:
+    This function runs the following commands in order to update the `pre-commit`
+    configuration and run all `pre-commit` hooks:
 
-    1. 'pre-commit autoupdate' to update all hooks to the latest versions.
-    2. 'pre-commit run -a' to run all hooks against all files.
-
-    It captures the output of each command, logs the progress, and handles
-    any exceptions or interruptions that occur during their execution.
+    - `pre-commit autoupdate`: Update the pre-commit configuration.
+    - `pre-commit run -a`: Run all pre-commit hooks.
     """
 
-    cmd_names = {
-        "update": "pre-commit autoupdate",
-        "run": "pre-commit run -a",
+    commands = {
+        "pre-commit autoupdate": "Update the pre-commit configuration",
+        "pre-commit run -a": "Run all pre-commit hooks",
     }
 
-    cmd_update = shlex.split(cmd_names["update"])
-    cmd_run = shlex.split(cmd_names["run"])
-
-    for cmd_name, cmd in zip(
-        cmd_names.values(),
-        [cmd_update, cmd_run],
-        strict=True,
-    ):
-        try:
-            logger.info(f"Running: '{cmd_name}'...")
-            _ = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                check=False,
-            )
-        except Exception as e:
-            logger.error(f"Failed to run {cmd}: {e!s}")
-            raise
-        except KeyboardInterrupt:
-            logger.warning(f"{cmd} interrupted.")
-            return
-
-
-def run_pyment() -> None:
-    """
-    Execute the 'pyment' command to run the Python code in the current directory.
-
-    This function runs the 'pyment' command to run the Python code in the
-    current directory. It captures the command's output and logs any exceptions
-    or interruptions that occur during its execution.
-    """
-
-    cmd_name = "pyment -f false -o google ."
-    cmd = shlex.split(cmd_name)
-
-    try:
-        logger.info(f"Running: '{cmd_name}'...")
-        _ = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-    except Exception as e:
-        logger.error(f"Failed to run 'pyment': {e!s}")
-        raise
-    except KeyboardInterrupt:
-        logger.warning("'pyment' interrupted.")
-        return
+    for cmd, desc in commands.items():
+        run_command(cmd, desc)
