@@ -84,7 +84,7 @@ def run_precommit() -> None:
     }
 
     for cmd, desc in commands.items():
-        run_command(cmd, desc)
+        run_command(cmd, desc, check=False, show_output=True)
 
 
 def remove_all_experiments() -> None:
