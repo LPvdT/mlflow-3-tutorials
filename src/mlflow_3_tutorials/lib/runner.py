@@ -33,11 +33,10 @@ def run_command(
 
         if check:
             _raise_called_process_error(result, cmd_str)
-
-        logger.success(f"Command '{description}' completed successfully.")
-
     except KeyboardInterrupt:
         logger.warning(f"'{description}' interrupted by user.")
+    else:
+        logger.success(f"Command '{description}' completed successfully.")
 
 
 def _raise_called_process_error(
