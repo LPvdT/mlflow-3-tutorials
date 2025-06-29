@@ -12,7 +12,7 @@ from mlflow_3_tutorials.lib.utils import (
 )
 
 
-def main() -> None:  # noqa
+def main() -> None:
     client = MlflowClient(tracking_uri=TRACKING_URI)
 
     # List all experiments
