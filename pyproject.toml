@@ -18,10 +18,13 @@ dependencies = [
 ]
 
 [project.scripts]
+# Repository commands
 run_sync = "mlflow_3_tutorials.lib.scripts:uv_sync"
-run_server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
 run_precommit = "mlflow_3_tutorials.lib.scripts:run_precommit"
 run_pyment = "mlflow_3_tutorials.lib.scripts:run_pyment"
+# MLflow commands
+remove_experiments = "mlflow_3_tutorials.lib.scripts:remove_all_experiments"
+start_server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
 first_model = "mlflow_3_tutorials.first_model:main"
 
 [dependency-groups]

@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import mlflow
 from loguru import logger
 
@@ -83,3 +85,24 @@ def run_precommit() -> None:
 
     for cmd, desc in commands.items():
         run_command(cmd, desc)
+
+
+def remove_all_experiments() -> None:
+    experiment_ids = [
+        p
+        for p in Path().cwd().rglob(r"mlruns/*")
+        if (p.name.isdigit() and p.name != "0") or p.name == ".trash"
+    ]
+
+    if not experiment_ids:
+        logger.info("No experiments to delete")
+        return
+
+    for exp in experiment_ids:
+        if exp.name == ".trash":
+            run_command(f"rm -rf {exp}", "Remove .trash directory")
+        else:
+            run_command(
+                f"mlflow experiments delete -x {exp.name}",
+                f"Remove experiment: {exp.name}",
+            )
