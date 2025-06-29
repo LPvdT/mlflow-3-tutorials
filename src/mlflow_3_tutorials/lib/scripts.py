@@ -23,6 +23,12 @@ def configure_tracking_server() -> None:
 
 
 def start_tracking_server() -> None:
+    """
+    Start an MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}.
+
+    This function runs the command `mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}` and logs the result.
+    """
+
     run_command(
         f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}",
         "MLflow tracking server",
@@ -30,23 +36,49 @@ def start_tracking_server() -> None:
 
 
 def uv_sync() -> None:
+    """
+    Run the command `uv sync --managed-python --all-groups --compile-bytecode`
+    to install the project's dependencies and compile bytecode.
+
+    This function logs the result of the command.
+    """
+
     run_command(
         "uv sync --managed-python --all-groups --compile-bytecode",
         "uv sync",
     )
 
 
-def run_pyment() -> None:
+def run_pyment(style: str = "google") -> None:
+    """
+    Run the `pyment` docstring formatter with the specified style.
+
+    This function logs the result of the command.
+
+    Args:
+        style (str): The docstring style to format with, defaults to 'google'.
+    """
+
     run_command(
-        "pyment -f false -o google .",
+        f"pyment -f false -o {style} .",
         "pyment docstring formatter",
     )
 
 
 def run_precommit() -> None:
+    """
+    Run the `pre-commit` hooks for the project.
+
+    This function runs the following commands in order to update the `pre-commit`
+    configuration and run all `pre-commit` hooks:
+
+    - `pre-commit autoupdate`: Update the pre-commit configuration.
+    - `pre-commit run -a`: Run all pre-commit hooks.
+    """
+
     commands = {
-        "pre-commit autoupdate": "pre-commit update",
-        "pre-commit run -a": "pre-commit run all hooks",
+        "pre-commit autoupdate": "Update the pre-commit configuration",
+        "pre-commit run -a": "Run all pre-commit hooks",
     }
 
     for cmd, desc in commands.items():
