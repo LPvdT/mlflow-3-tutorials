@@ -7,8 +7,9 @@ from loguru import logger
 from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 
 
+# ruff: noqa: PLR6301
 class InterceptHandler(Handler):
-    def emit(self, record: LogRecord) -> None:  # noqa
+    def emit(self, record: LogRecord) -> None:
         try:
             level: str | int = logger.level(record.levelname).name
         except ValueError:
