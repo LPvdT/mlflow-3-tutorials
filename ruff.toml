@@ -3,57 +3,48 @@ line-length = 80
 unsafe-fixes = true
 
 lint.select = [
-    "ALL",  # All rules
-    "F",    # pyflakes
-    "E",    # pycodestyle errors
-    "W",    # pycodestyle warnings
-    "C90",  # mccabe
-    "N",    # pep8-naming
-    "UP",   # pyupgrade
-    "YTT",  # flake8-2020
-    "BLE",  # flake8-blind-except
-    "B",    # flake8-bugbear
-    "A",    # flake8-builtins
-    "C4",   # flake8-comprehensions
-    "DTZ",  # flake8-datetimez
-    "T10",  # flake8-debugger
-    "EXE",  # flake8-executable
-    "ICN",  # flake8-import-conventions
-    "INP",  # flake8-no-pep420
-    "PIE",  # flake8-pie
-    "RET",  # flake8-return
-    "SLF",  # flake8-self
-    "SIM",  # flake8-simplify
-    "TRY",  # tryceratops
-    "RUF",  # Ruff-specific rules
-    "F401", # unused imports (redundant if already in F, but for clarity)
+    "ALL",
 ]
 
 lint.ignore = [
+    "I",   # isort
     "D",   # pydocstyle
     "DOC", # pydoclint
-    "TD",  # Author TODO
-    "CPY", # Flake8-copyright
+    "TD",  # comments TODO
+    "CPY", # copyright
 ]
 
 lint.extend-ignore = [
-    "FIX002",  # Resolve TODO
-    "B008",    # function call in argument defaults
-    "E501",    # line too long
-    "S603",    # subprocess starting a process with a partial executable path
-    "S607",    # Starting a process with a partial executable path
-    "S404",    # Subprocess
-    "PGH004",  # Use specific rule codes when using `noqa`
-    "PGH003",  # Use specific rule codes when using `type: ignore`
-    "N806",    # Variable name should be lowercase
-    "PLR0914", # Too many local variables
+    # pycodestyle
+    "E501",
+
+    # bandit
+    "S603",
+    "S607",
+    "S404",
+
+    # flake8-builtins
+    "B008",
+
+    # pep8-naming
+    "N806",
+
+    # ruff plugins hygiene
+    "PGH003",
+    "PGH004",
+
+    # flake8-refactor
+    "PLR0914",
+
+    # fixme-style TODO
+    "FIX002",
 ]
 
 lint.fixable = [
     "ALL",
 ]
 
-lint.exclude = [
+exclude = [
     ".git",
     "__pycache__",
     "build",
@@ -65,7 +56,16 @@ lint.exclude = [
 
 [lint.per-file-ignores]
 "**/tests/*" = [
-    "S101", # Allow assert statements in tests
+    "S101",
+]
+"**/scripts/*" = [
+    "INP001",
+]
+"**/migrations/*" = [
+    "E501",
+    "B008",
+    "F401",
+    "D",
 ]
 
 [lint.mccabe]
