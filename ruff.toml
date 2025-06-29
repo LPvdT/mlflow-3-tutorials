@@ -37,15 +37,16 @@ lint.ignore = [
 ]
 
 lint.extend-ignore = [
-    "FIX002", # Resolve TODO
-    "B008",   # function call in argument defaults
-    "E501",   # line too long
-    "S603",   # subprocess starting a process with a partial executable path
-    "S607",   # Starting a process with a partial executable path
-    "S404",   # Subprocess
-    "PGH004", # Use specific rule codes when using `noqa`
-    "PGH003", # Use specific rule codes when using `type: ignore`
-    "N806",   # Variable name should be lowercase
+    "FIX002",  # Resolve TODO
+    "B008",    # function call in argument defaults
+    "E501",    # line too long
+    "S603",    # subprocess starting a process with a partial executable path
+    "S607",    # Starting a process with a partial executable path
+    "S404",    # Subprocess
+    "PGH004",  # Use specific rule codes when using `noqa`
+    "PGH003",  # Use specific rule codes when using `type: ignore`
+    "N806",    # Variable name should be lowercase
+    "PLR0914", # Too many local variables
 ]
 
 lint.fixable = [
