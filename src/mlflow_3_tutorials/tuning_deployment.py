@@ -1,18 +1,19 @@
+from operator import itemgetter
 from typing import Any, TypeVar, cast
 
 import keras
+import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import pandas as pd
-import tensorflow as tf
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
 from loguru import logger
 from mlflow.models import infer_signature
 from numpy.typing import NDArray
-from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
 from mlflow_3_tutorials.lib.constants import WINE_QUALITY_DATA_URL
+from mlflow_3_tutorials.lib.utils import as_json
 
 DType = TypeVar("DType", bound=np.generic)
 
@@ -114,3 +115,140 @@ def create_and_train_model(
         "history": history,
         "epochs_trained": len(history.history["loss"]),
     }
+
+
+def objective(params: dict[str, Any]) -> dict[str, Any] | None:
+    """
+    Objective function for hyperparameter optimization.
+
+    This function will be called by Hyperopt for each trial.
+    """
+
+    with mlflow.start_run(nested=True):
+        # Log hyperparameters being tested
+        logger.info(f"Hyperparameters: {as_json(params)}")
+        mlflow.log_params({
+            "learning_rate": params["learning_rate"],
+            "momentum": params["momentum"],
+            "optimizer": "SGD",
+            "architecture": "64-32-1",
+        })
+
+        # Train model with current hyperparameters
+        result = create_and_train_model(
+            learning_rate=params["learning_rate"],
+            momentum=params["momentum"],
+            epochs=15,
+        )
+
+        # Log training results
+        training_metrics = {
+            "val_rmse": result["val_rmse"],
+            "val_loss": result["val_loss"],
+            "epochs_trained": result["epochs_trained"],
+        }
+        logger.info(f"training_metrics: {as_json(training_metrics)}")
+        mlflow.log_metrics(training_metrics)
+
+        # Log the trained model
+        mlflow.tensorflow.log_model(  # type: ignore
+            result["model"],
+            name="model",
+            signature=signature,
+        )
+
+        # Log training curves as artifacts
+        plt.figure(figsize=(12, 4))
+
+        plt.subplot(1, 2, 1)
+        plt.plot(result["history"].history["loss"], label="Training Loss")
+        plt.plot(result["history"].history["val_loss"], label="Validation Loss")
+        plt.title("Model Loss")
+        plt.xlabel("Epoch")
+        plt.ylabel("Loss")
+        plt.legend()
+
+        plt.subplot(1, 2, 2)
+        plt.plot(
+            result["history"].history["root_mean_squared_error"],
+            label="Training RMSE",
+        )
+        plt.plot(
+            result["history"].history["val_root_mean_squared_error"],
+            label="Validation RMSE",
+        )
+        plt.title("Model RMSE")
+        plt.xlabel("Epoch")
+        plt.ylabel("RMSE")
+        plt.legend()
+
+        plt.tight_layout()
+        plt.savefig("training_curves.png")
+        mlflow.log_artifact("training_curves.png")
+        plt.close()
+
+        # Return loss for Hyperopt (it minimizes)
+        return {"loss": result["val_rmse"], "status": STATUS_OK}
+
+
+# Define search space for hyperparameters
+search_space = {
+    "learning_rate": hp.loguniform("learning_rate", np.log(1e-5), np.log(1e-1)),
+    "momentum": hp.uniform("momentum", 0.0, 0.9),
+}
+
+logger.info("Search space defined:")
+logger.info("learning_rate: 1e-5 to 1e-1 (log-uniform)")
+logger.info("momentum: 0.0 to 0.9 (uniform)")
+
+# Create or set experiment
+experiment_name = "wine-quality-optimization"
+mlflow.set_experiment(experiment_name)
+
+logger.info(
+    f"Starting hyperparameter optimization experiment: {experiment_name}",
+)
+logger.info("This will run 15 trials to find optimal hyperparameters...")
+
+with mlflow.start_run(run_name="hyperparameter-sweep"):
+    # Log experiment metadata
+    mlflow.log_params({
+        "optimization_method": "Tree-structured Parzen Estimator (TPE)",
+        "max_evaluations": 15,
+        "objective_metric": "validation_rmse",
+        "dataset": "wine-quality",
+        "model_type": "neural_network",
+    })
+
+    # Run optimization
+    trials = Trials()
+    best_params = fmin(
+        fn=objective,
+        space=search_space,
+        algo=tpe.suggest,
+        max_evals=15,
+        trials=trials,
+        verbose=True,
+    )
+
+    # Find and log best results
+    best_trial = min(trials.results, key=itemgetter("loss"))
+    best_rmse = best_trial["loss"]
+
+    # Log optimization results
+    if best_params is not None:
+        logger.info(f"Best parameters found: {as_json(best_params)}")
+        mlflow.log_params({
+            "best_learning_rate": best_params["learning_rate"],
+            "best_momentum": best_params["momentum"],
+        })
+    else:
+        logger.error("Optimization failed to find valid parameters.")
+
+    final_metrics = {
+        "best_val_rmse": best_rmse,
+        "total_trials": len(trials.trials),
+        "optimization_completed": 1,
+    }
+    logger.info(f"final_metrics: {as_json(final_metrics)}")
+    mlflow.log_metrics(final_metrics)
