@@ -11,5 +11,8 @@ wheels/
 # Virtual environments
 .venv
 
+# Miscellaneous
+todo.md
+
 # MLflow
 mlruns/
