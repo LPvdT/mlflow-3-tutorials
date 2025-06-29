@@ -29,9 +29,8 @@ uv sync --managed-python --all-groups --compile-bytecode
 
 - `first_model.py`:
   - Run: `uv run first_model`
-    - If you encounter an error that the experiment already exists, then delete it manually for now:
-      - `mlruns/142873212763357834` and/or `mlruns/665733959038238543`
-      > - Actual IDs are different for you
+    - If you encounter an error that the experiment already exists:
+      - Run: `uv run remove_experiments`
 
 ### Hyperparameter Tuning & Deployment
 

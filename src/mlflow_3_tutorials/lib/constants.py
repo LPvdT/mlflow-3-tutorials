@@ -1,6 +1,11 @@
 import logging
 from typing import Final
 
+# URL for the wine quality dataset
+WINE_QUALITY_DATA_URL: Final[str] = (
+    "https://raw.githubusercontent.com/mlflow/mlflow/master/tests/datasets/winequality-white.csv"
+)
+
 # URL and port for the MLflow tracking server.
 TRACKING_URL: Final[str] = "http://127.0.0.1"
 TRACKING_PORT: Final[int] = 8080
