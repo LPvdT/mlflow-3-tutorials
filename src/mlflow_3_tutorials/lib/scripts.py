@@ -94,7 +94,9 @@ def remove_all_experiments() -> None:
         if (p.name.isdigit() and p.name != "0") or p.name == ".trash"
     ]
 
-    experiment_ids = sorted(experiment_ids, reverse=True)
+    if not experiment_ids:
+        logger.info("No experiments to delete")
+        return
 
     for exp in experiment_ids:
         if exp.name == ".trash":
