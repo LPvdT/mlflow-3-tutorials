@@ -257,3 +257,7 @@ def main() -> None:
         }
         logger.info(f"final_metrics: {as_json(final_metrics)}")
         mlflow.log_metrics(final_metrics)
+
+
+if __name__ == "__main__":
+    main()
