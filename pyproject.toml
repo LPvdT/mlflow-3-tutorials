@@ -27,10 +27,11 @@ run_pyment = "mlflow_3_tutorials.lib.scripts:run_pyment"
 remove_experiments = "mlflow_3_tutorials.lib.scripts:remove_all_experiments"
 start_server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
 first_model = "mlflow_3_tutorials.first_model:main"
+tuning_deployment = "mlflow_3_tutorials.tuning_deployment:main"
 
 [dependency-groups]
 dev = [
-    "basedpyright>=1.29.4",
+    "basedpyright>=1.29.5",
     "ipykernel>=6.29.5",
     "ipywidgets>=8.1.7",
     "mccabe>=0.7.0",
@@ -52,6 +53,7 @@ build-backend = "hatchling.build"
 target-version = "py312"
 line-length = 80
 unsafe-fixes = true
+preview = true
 
 select = [
     "ALL",
