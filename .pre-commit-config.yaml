@@ -23,7 +23,12 @@ repos:
       - id: ruff-check
         name: Ruff Check
         types_or: [python, pyi]
-        args: [--fix, --config=pyproject.toml, --exit-zero, --unsafe-fixes, .]
+        args:
+          - --fix
+          - --config=pyproject.toml
+          - --exit-zero
+          - --unsafe-fixes
+          - .
 
       - id: ruff-format
         name: Ruff Format
