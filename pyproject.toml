@@ -10,7 +10,7 @@ requires-python = ">=3.12"
 dependencies = [
     "hyperopt>=0.2.7",
     "loguru>=0.7.3",
-    "mlflow[extras]>=3.1.1",
+    "mlflow>=3.1.1",
     "numpy>=2.1.3",
     "pandas>=2.3.0",
     "scikit-learn>=1.7.0",
@@ -32,6 +32,9 @@ serve_wine_model = "mlflow_3_tutorials.lib.scripts:serve_wine_model"
 tensorflow = [
     "keras>=3.10.0",
     "tensorflow>=2.19.0",
+]
+mlflow_extras = [
+    "mlflow[extras]>=3.1.1",
 ]
 
 [dependency-groups]
