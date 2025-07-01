@@ -9,13 +9,11 @@ authors = [
 requires-python = ">=3.12"
 dependencies = [
     "hyperopt>=0.2.7",
-    "keras>=3.10.0",
     "loguru>=0.7.3",
     "mlflow[extras]>=3.1.1",
     "numpy>=2.1.3",
     "pandas>=2.3.0",
     "scikit-learn>=1.7.0",
-    "tensorflow>=2.19.0",
 ]
 
 [project.scripts]
@@ -29,6 +27,12 @@ start_server = "mlflow_3_tutorials.lib.scripts:start_tracking_server"
 first_model = "mlflow_3_tutorials.first_model:main"
 tuning_deployment = "mlflow_3_tutorials.tuning_deployment:main"
 serve_wine_model = "mlflow_3_tutorials.lib.scripts:serve_wine_model"
+
+[project.optional-dependencies]
+tensorflow = [
+    "keras>=3.10.0",
+    "tensorflow>=2.19.0",
+]
 
 [dependency-groups]
 dev = [
