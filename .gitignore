@@ -16,3 +16,6 @@ todo.md
 
 # MLflow
 mlruns/
+
+# Artifacts
+*.png

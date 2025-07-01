@@ -112,3 +112,7 @@ def main() -> None:
             input_example=X_val,
             name=artifact_path,
         )
+
+
+if __name__ == "__main__":
+    main()

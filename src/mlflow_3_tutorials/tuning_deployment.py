@@ -191,64 +191,73 @@ def objective(params: dict[str, Any]) -> dict[str, Any] | None:
         return {"loss": result["val_rmse"], "status": STATUS_OK}
 
 
-# Define search space for hyperparameters
-search_space = {
-    "learning_rate": hp.loguniform("learning_rate", np.log(1e-5), np.log(1e-1)),
-    "momentum": hp.uniform("momentum", 0.0, 0.9),
-}
-
-logger.info("Search space defined:")
-logger.info("learning_rate: 1e-5 to 1e-1 (log-uniform)")
-logger.info("momentum: 0.0 to 0.9 (uniform)")
-
-# Create or set experiment
-experiment_name = "wine-quality-optimization"
-mlflow.set_experiment(experiment_name)
-
-logger.info(
-    f"Starting hyperparameter optimization experiment: {experiment_name}",
-)
-logger.info("This will run 15 trials to find optimal hyperparameters...")
-
-with mlflow.start_run(run_name="hyperparameter-sweep"):
-    # Log experiment metadata
-    mlflow.log_params({
-        "optimization_method": "Tree-structured Parzen Estimator (TPE)",
-        "max_evaluations": 15,
-        "objective_metric": "validation_rmse",
-        "dataset": "wine-quality",
-        "model_type": "neural_network",
-    })
-
-    # Run optimization
-    trials = Trials()
-    best_params = fmin(
-        fn=objective,
-        space=search_space,
-        algo=tpe.suggest,
-        max_evals=15,
-        trials=trials,
-        verbose=True,
-    )
-
-    # Find and log best results
-    best_trial = min(trials.results, key=itemgetter("loss"))
-    best_rmse = best_trial["loss"]
-
-    # Log optimization results
-    if best_params is not None:
-        logger.info(f"Best parameters found: {as_json(best_params)}")
-        mlflow.log_params({
-            "best_learning_rate": best_params["learning_rate"],
-            "best_momentum": best_params["momentum"],
-        })
-    else:
-        logger.error("Optimization failed to find valid parameters.")
-
-    final_metrics = {
-        "best_val_rmse": best_rmse,
-        "total_trials": len(trials.trials),
-        "optimization_completed": 1,
+def main() -> None:
+    # Define search space for hyperparameters
+    search_space = {
+        "learning_rate": hp.loguniform(
+            "learning_rate",
+            np.log(1e-5),
+            np.log(1e-1),
+        ),
+        "momentum": hp.uniform("momentum", 0.0, 0.9),
     }
-    logger.info(f"final_metrics: {as_json(final_metrics)}")
-    mlflow.log_metrics(final_metrics)
+
+    logger.info("Search space defined:")
+    logger.info("learning_rate: 1e-5 to 1e-1 (log-uniform)")
+    logger.info("momentum: 0.0 to 0.9 (uniform)")
+
+    # Create or set experiment
+    experiment_name = "wine-quality-optimization"
+    mlflow.set_experiment(experiment_name)
+
+    logger.info(
+        f"Starting hyperparameter optimization experiment: {experiment_name}",
+    )
+    logger.info("This will run 15 trials to find optimal hyperparameters...")
+
+    with mlflow.start_run(run_name="hyperparameter-sweep"):
+        # Log experiment metadata
+        mlflow.log_params({
+            "optimization_method": "Tree-structured Parzen Estimator (TPE)",
+            "max_evaluations": 15,
+            "objective_metric": "validation_rmse",
+            "dataset": "wine-quality",
+            "model_type": "neural_network",
+        })
+
+        # Run optimization
+        trials = Trials()
+        best_params = fmin(
+            fn=objective,
+            space=search_space,
+            algo=tpe.suggest,
+            max_evals=15,
+            trials=trials,
+            verbose=True,
+        )
+
+        # Find and log best results
+        best_trial = min(trials.results, key=itemgetter("loss"))
+        best_rmse = best_trial["loss"]
+
+        # Log optimization results
+        if best_params is not None:
+            logger.info(f"Best parameters found: {as_json(best_params)}")
+            mlflow.log_params({
+                "best_learning_rate": best_params["learning_rate"],
+                "best_momentum": best_params["momentum"],
+            })
+        else:
+            logger.error("Optimization failed to find valid parameters.")
+
+        final_metrics = {
+            "best_val_rmse": best_rmse,
+            "total_trials": len(trials.trials),
+            "optimization_completed": 1,
+        }
+        logger.info(f"final_metrics: {as_json(final_metrics)}")
+        mlflow.log_metrics(final_metrics)
+
+
+if __name__ == "__main__":
+    main()
