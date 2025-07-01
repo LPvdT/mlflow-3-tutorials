@@ -106,3 +106,14 @@ def remove_all_experiments() -> None:
                 f"mlflow experiments delete -x {exp.name}",
                 f"Remove experiment: {exp.name}",
             )
+
+
+def serve_wine_model(
+    model_name: str = "wine-quality-predictor",
+    version: int = 1,
+    port: int = 5002,
+) -> None:
+    run_command(
+        f'mlflow models serve -m "models:/{model_name}/{version}" --port {port} --env-manager local',
+        f"Serving: '{model_name}' - version {version}",
+    )
