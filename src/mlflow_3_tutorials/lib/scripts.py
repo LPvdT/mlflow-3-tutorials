@@ -39,14 +39,14 @@ def start_tracking_server() -> None:
 
 def uv_sync() -> None:
     """
-    Run the command `uv sync --managed-python --all-groups --compile-bytecode`
-    to install the project's dependencies and compile bytecode.
+    Run the command `uv sync --managed-python --all-groups`
+    to install the project's dependencies.
 
     This function logs the result of the command.
     """
 
     run_command(
-        "uv sync --managed-python --all-groups --compile-bytecode",
+        "uv sync --managed-python --all-groups",
         "uv sync",
     )
 
