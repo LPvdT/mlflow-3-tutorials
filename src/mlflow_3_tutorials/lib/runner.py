@@ -26,10 +26,7 @@ def run_command(
     try:
         logger.info(f"Running: '{description}' - [{cmd_str}]...")
         result = subprocess.run(
-            cmd,
-            capture_output=True,
-            text=True,
-            check=check,
+            cmd, capture_output=True, text=True, check=check, timeout=5
         )
 
         if show_output:
@@ -39,6 +36,8 @@ def run_command(
 
         if check:
             _raise_called_process_error(result, cmd_str)
+    except subprocess.TimeoutExpired:
+        logger.error(f"Command '{description}' timed out.")
     except KeyboardInterrupt:
         logger.warning(f"'{description}' interrupted by user.")
     else:
