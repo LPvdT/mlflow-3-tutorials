@@ -7,6 +7,7 @@ from loguru import logger
 def run_command(
     cmd_str: str,
     description: str | None = None,
+    timeout: int | None = 5,
     *,
     check: bool = True,
     show_output: bool = False,
@@ -26,7 +27,7 @@ def run_command(
     try:
         logger.info(f"Running: '{description}' - [{cmd_str}]...")
         result = subprocess.run(
-            cmd, capture_output=True, text=True, check=check, timeout=5
+            cmd, capture_output=True, text=True, check=check, timeout=timeout
         )
 
         if show_output:
