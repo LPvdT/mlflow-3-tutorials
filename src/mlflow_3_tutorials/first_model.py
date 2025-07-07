@@ -17,7 +17,7 @@ def main() -> None:
 
     # List all experiments
     all_experiments = client.search_experiments()
-    logger.info(f"experiments: {as_json(vars(all_experiments))}")
+    logger.info(f"experiments: {as_json(all_experiments)}")
 
     # Default experiment
     default_experiment = next(
@@ -53,7 +53,7 @@ def main() -> None:
         filter_string="tags.`project_name` = 'grocery-forecasting'",
     )
 
-    logger.info(f"apples_experiment: {as_json(vars(apples_experiment[0]))}")
+    logger.info(f"apples_experiment: {as_json(apples_experiment[0])}")
 
     # Train and log first model
     data = generate_apple_sales_data_with_promo_adjustment(1_000, 5_000)
