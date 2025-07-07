@@ -1,27 +1,14 @@
 from pathlib import Path
 
-import mlflow
 from loguru import logger
 
 from mlflow_3_tutorials.lib.constants import (
+    BACKEND_STORE,
+    DEFAULT_ARTIFACT_ROOT,
     SERVER_ADDRESS,
     SERVER_PORT,
-    TRACKING_URI,
 )
 from mlflow_3_tutorials.lib.runner import run_command
-
-
-def configure_tracking_server() -> None:
-    """
-    Configure MLflow to use the MLflow tracking server running on
-    http://{SERVER_ADDRESS}:{SERVER_PORT}.
-
-    This function sets the MLflow tracking URI to
-    http://{SERVER_ADDRESS}:{SERVER_PORT} and logs the result.
-    """
-
-    logger.info(f"Setting MLflow tracking URI to: {TRACKING_URI}")
-    mlflow.set_tracking_uri(TRACKING_URI)
 
 
 def start_tracking_server() -> None:
@@ -32,21 +19,24 @@ def start_tracking_server() -> None:
     """
 
     run_command(
-        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}",
-        f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT}",
+        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT} "
+        f"--backend-store-uri {BACKEND_STORE} --default-artifact-root {DEFAULT_ARTIFACT_ROOT}",
+        f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT} - "
+        f"backend-store-uri={BACKEND_STORE} default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        timeout=None,
     )
 
 
 def uv_sync() -> None:
     """
-    Run the command `uv sync --managed-python --all-groups --compile-bytecode`
-    to install the project's dependencies and compile bytecode.
+    Run the command `uv sync --managed-python --all-groups`
+    to install the project's dependencies.
 
     This function logs the result of the command.
     """
 
     run_command(
-        "uv sync --managed-python --all-groups --compile-bytecode",
+        "uv sync --managed-python --all-groups",
         "uv sync",
     )
 
