@@ -8,20 +8,25 @@ import pytz
 from loguru import logger
 
 
-def as_json(obj: Any) -> str:  # noqa
+def as_json(obj: object, *, indent: int = 2) -> str:
     """
     Serializes a given object to a JSON formatted string.
+
+    Handles pandas Timestamps and falls back to string conversion for non-serializable objects.
     """
 
+    def _fallback_serializer(x: Any) -> Any:
+        if isinstance(x, pd.Timestamp):
+            return x.isoformat()
+
+        try:
+            return vars(x)  # Try converting custom objects to dict
+        except TypeError:
+            return str(x)  # Final fallback
+
     try:
-        payload = json.dumps(
-            obj,
-            indent=2,
-            default=lambda x: x.isoformat()
-            if isinstance(x, pd.Timestamp)
-            else x,
-        )
-    except json.JSONDecodeError as e:
+        payload = json.dumps(obj, indent=indent, default=_fallback_serializer)
+    except (TypeError, OverflowError) as e:
         msg = f"Object {obj} cannot be serialized to JSON: {e!s}"
         logger.error(msg)
         raise ValueError(msg) from e
