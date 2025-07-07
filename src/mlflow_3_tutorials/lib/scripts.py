@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from loguru import logger
 
@@ -19,16 +20,17 @@ def start_tracking_server() -> None:
 
     run_command(
         f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT} "
-        # f"--backend-store-uri={BACKEND_STORE} --default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT} - "
-        # f"backend-store-uri={BACKEND_STORE} default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         timeout=None,
     )
 
 
-def uv_sync() -> None:
+def uv_sync(
+    extras: list[Literal["tensorflow", "pytorch", "mlflow_extras"]]
+    | None = None,
+) -> None:
     """
     Run the command `uv sync --managed-python --all-groups`
     to install the project's dependencies.
@@ -37,8 +39,9 @@ def uv_sync() -> None:
     """
 
     run_command(
-        "uv sync --managed-python --all-groups",
-        "uv sync",
+        "uv sync --managed-python --all-groups "
+        f"{'--extra '.join(extras) if extras else ''}",
+        f"uv sync{' [' + ' ' + ']'.join(extras) if extras else ''}",
     )
 
 
