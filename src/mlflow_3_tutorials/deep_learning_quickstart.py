@@ -4,6 +4,7 @@ import mlflow
 import mlflow.pytorch
 import pandas as pd
 import torch
+from loguru import logger
 from mlflow.data import pandas_dataset
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
@@ -14,6 +15,7 @@ from mlflow_3_tutorials.lib.dl_utils import (
     compute_accuracy,
     prepare_data,
 )
+from mlflow_3_tutorials.lib.utils import as_json
 
 
 def main() -> None:
@@ -47,7 +49,7 @@ def main() -> None:
     scripted_model = torch.jit.script(scripted_model)
 
     # Start a run to represent the training job
-    with mlflow.start_run() as _run:
+    with mlflow.start_run() as run:
         # Load the training dataset with MLflow and link training metrics
         train_dataset = pandas_dataset.from_pandas(train_df, name="train")
         X_train, y_train = prepare_data(train_dataset.df)  # type: ignore
@@ -97,3 +99,18 @@ def main() -> None:
                     model_id=model_info.model_id,
                     dataset=train_dataset,  # type: ignore
                 )
+
+    # Search for the best and worst checkpoints
+    ranked_checkpoints = mlflow.search_logged_models(
+        filter_string=f"source_run_id='{run.info.run_id}'",
+        order_by=[{"field_name": "metrics.accuracy", "ascending": False}],
+        output_format="list",
+    )
+
+    best_checkpoint = ranked_checkpoints[0]
+    logger.info(f"Best model: {as_json(best_checkpoint)}")
+    logger.info(f"Metrics: {as_json(best_checkpoint.metrics)}")
+
+    worst_checkpoint = ranked_checkpoints[-1]
+    logger.warning(f"Worst model: {as_json(worst_checkpoint)}")
+    logger.warning(f"Metrics: {as_json(worst_checkpoint.metrics)}")
