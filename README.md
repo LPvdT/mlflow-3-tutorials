@@ -27,10 +27,21 @@ uv sync --managed-python --all-groups
 
 ## Running projects
 
+All the information about running the individual projects can be found here.
+
+**Before running any projects, be sure to start the tracking server:**
+
+```sh
+# Start the MLflow tracking server
+uv run start_server
+```
+
 > [!TIP]
 > You can run `rm -rf .venv/ uv.lock` after each project, and before running the next required `uv sync` command to cut down on the size of your `.venv` folder.
 
 ### First MLflow Model
+
+<!-- TODO: Describe what this does -->
 
 > [!IMPORTANT]
 > Ensure you have run [the initial `uv sync`](#installation-development) command.
@@ -41,6 +52,8 @@ uv sync --managed-python --all-groups
       - Run: `uv run remove_experiments`
 
 ### Hyperparameter Tuning & Deployment
+
+<!-- TODO: Describe what this does -->
 
 > [!IMPORTANT]
 > Run:
@@ -53,6 +66,8 @@ uv sync --managed-python --all-groups
 
 ### Deep Learning Quickstart
 
+<!-- TODO: Describe what this does -->
+
 > [!IMPORTANT]
 > Run:
 >
@@ -62,5 +77,7 @@ uv sync --managed-python --all-groups
   - Run: `uv run deep_learning`
 
 ### Model Registry Quickstart
+
+<!-- TODO: Describe what this does -->
 
 - > Work in progress
