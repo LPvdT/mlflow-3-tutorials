@@ -1,27 +1,12 @@
 from pathlib import Path
 
-import mlflow
 from loguru import logger
 
 from mlflow_3_tutorials.lib.constants import (
     SERVER_ADDRESS,
     SERVER_PORT,
-    TRACKING_URI,
 )
 from mlflow_3_tutorials.lib.runner import run_command
-
-
-def configure_tracking_server() -> None:
-    """
-    Configure MLflow to use the MLflow tracking server running on
-    http://{SERVER_ADDRESS}:{SERVER_PORT}.
-
-    This function sets the MLflow tracking URI to
-    http://{SERVER_ADDRESS}:{SERVER_PORT} and logs the result.
-    """
-
-    logger.info(f"Setting MLflow tracking URI to: {TRACKING_URI}")
-    mlflow.set_tracking_uri(TRACKING_URI)
 
 
 def start_tracking_server() -> None:
@@ -32,7 +17,8 @@ def start_tracking_server() -> None:
     """
 
     run_command(
-        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}",
+        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT} "
+        "--backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns",
         f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT}",
         timeout=None,
     )
