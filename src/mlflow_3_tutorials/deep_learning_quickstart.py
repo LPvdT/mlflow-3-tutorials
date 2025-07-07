@@ -39,7 +39,7 @@ def main() -> None:
     # Define the PyTorch model and move it to the device
     input_size = X_train.shape[1]
     hidden_size = 16
-    output_size = len(iris.target_name)  # type: ignore
+    output_size = len(iris.target_names)  # type: ignore
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     scripted_model = IrisClassifier(input_size, hidden_size, output_size).to(
