@@ -9,7 +9,6 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from torch import nn
 
-from mlflow_3_tutorials.lib.constants import TRACKING_URI
 from mlflow_3_tutorials.lib.dl_utils import (
     IrisClassifier,
     compute_accuracy,
@@ -48,7 +47,6 @@ def main() -> None:
     scripted_model = torch.jit.script(scripted_model)
 
     # Start a run to represent the training job
-    mlflow.set_tracking_uri(TRACKING_URI)
     with mlflow.start_run() as _run:
         # Load the training dataset with MLflow and link training metrics
         train_dataset = pandas_dataset.from_pandas(train_df, name="train")
@@ -57,7 +55,7 @@ def main() -> None:
         criterion = nn.CrossEntropyLoss()
         optimizer = torch.optim.Adam(scripted_model.parameters(), lr=1e-2)
 
-        for epoch in range(1, 100):
+        for epoch in range(101):
             X_train, y_train = X_train.to(device), y_train.to(device)
 
             out = scripted_model(X_train)

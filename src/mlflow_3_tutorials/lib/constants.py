@@ -20,7 +20,7 @@ BACKEND_STORE: Final[str] = "sqlite:///mlflow.db"
 DEFAULT_ARTIFACT_ROOT: Final[str] = "./mlruns"
 
 # MLflow tracking URI
-TRACKING_URI: Final[str] = f"{TRACKING_URL}:{TRACKING_PORT}"
+TRACKING_URI: Final[str] = f"http://{TRACKING_URL}:{TRACKING_PORT}"
 
 # Log level
 LOG_LEVEL: Final[int] = logging.INFO

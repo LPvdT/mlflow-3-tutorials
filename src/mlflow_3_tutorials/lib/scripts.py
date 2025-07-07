@@ -3,7 +3,6 @@ from pathlib import Path
 from loguru import logger
 
 from mlflow_3_tutorials.lib.constants import (
-    BACKEND_STORE,
     DEFAULT_ARTIFACT_ROOT,
     SERVER_ADDRESS,
     SERVER_PORT,
@@ -19,10 +18,12 @@ def start_tracking_server() -> None:
     """
 
     run_command(
-        f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT} "
-        f"--backend-store-uri {BACKEND_STORE} --default-artifact-root {DEFAULT_ARTIFACT_ROOT}",
+        f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT} "
+        # f"--backend-store-uri={BACKEND_STORE} --default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT} - "
-        f"backend-store-uri={BACKEND_STORE} default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        # f"backend-store-uri={BACKEND_STORE} default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        f"default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         timeout=None,
     )
 
