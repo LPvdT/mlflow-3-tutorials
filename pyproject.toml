@@ -107,6 +107,9 @@ extend-ignore = [
 
     # trailing comma
     "COM812",
+
+    # Argument name should be lowercase
+    "N803",
 ]
 
 fixable = [
