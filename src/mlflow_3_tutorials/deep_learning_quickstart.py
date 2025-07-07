@@ -8,34 +8,88 @@ from mlflow.data import pandas_dataset
 from mlflow.entities import Dataset
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
+from torch import nn
 
-from mlflow_3_tutorials.lib.dl_utils import IrisClassifier, prepare_data
-
-
-def main() -> None: ...
-
-
-# Load Iris dataset and prepare the DataFrame
-iris = load_iris()
-iris_df, iris_target = (
-    pd.DataFrame(iris.data, columns=iris.feature_names),  # type: ignore
-    iris.target,  # type: ignore
+from mlflow_3_tutorials.lib.dl_utils import (
+    IrisClassifier,
+    compute_accuracy,
+    prepare_data,
 )
 
-# Split into training and testing datasets
-train_df, test_df = train_test_split(iris_df, test_size=0.2, random_state=42)
-train_df = cast("pd.DataFrame", train_df)
-test_df = cast("pd.DataFrame", test_df)
 
-# Prepare training data
-train_dataset = pandas_dataset.from_pandas(train_df, name="train")
-X_train, y_train = prepare_data(train_dataset.df)
+def main() -> None:
+    # Load Iris dataset and prepare the DataFrame
+    iris = load_iris()
+    iris_df, _iris_target = (
+        pd.DataFrame(iris.data, columns=iris.feature_names),  # type: ignore
+        iris.target,  # type: ignore
+    )
 
-# Define the PyTorch model and move it to the device
-input_size = X_train.shape[1]
-hidden_size = 16
-output_size = len(iris.target_name)  # type: ignore
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    # Split into training and testing datasets
+    train_df, test_df = train_test_split(
+        iris_df, test_size=0.2, random_state=42
+    )
+    train_df = cast("pd.DataFrame", train_df)
+    test_df = cast("pd.DataFrame", test_df)
 
-scripted_model = IrisClassifier(input_size, hidden_size, output_size).to(device)
-scripted_model = torch.jit.script(scripted_model)
+    # Prepare training data
+    train_dataset = pandas_dataset.from_pandas(train_df, name="train")
+    X_train, y_train = prepare_data(train_dataset.df)
+
+    # Define the PyTorch model and move it to the device
+    input_size = X_train.shape[1]
+    hidden_size = 16
+    output_size = len(iris.target_name)  # type: ignore
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    scripted_model = IrisClassifier(input_size, hidden_size, output_size).to(
+        device
+    )
+    scripted_model = torch.jit.script(scripted_model)
+
+    # Start a run to represent the training job
+    with mlflow.start_run() as _run:
+        # Load the training dataset with MLflow and link training metrics
+        train_dataset = Dataset(
+            pandas_dataset.from_pandas(train_df, name="train")
+        )  # type: ignore
+        X_train, y_train = prepare_data(train_dataset.df)  # type: ignore
+
+        criterion = nn.CrossEntropyLoss()
+        optimizer = torch.optim.Adam(scripted_model.parameters(), lr=1e-2)
+
+        for epoch in range(1, 100):
+            X_train, y_train = X_train.to(device), y_train.to(device)
+
+            out = scripted_model(X_train)
+            loss = criterion(out, y_train)
+
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            if epoch % 10 == 0:
+                # Each newly created LoggedModel checkpoint is linked with its name and step
+                model_info = mlflow.pytorch.log_model(  # type: ignore
+                    pytorch_model=scripted_model,
+                    name=f"torch-iris-{epoch}",
+                    step=epoch,
+                    input_example=X_train.numpy(),
+                )
+
+                # Log params to the run, LoggedModel inherits those params
+                mlflow.log_params({
+                    "n_layers": 3,
+                    "activation": "ReLU",
+                    "criterion": "CrossEntropyLoss",
+                    "optimizer": "Adam",
+                })
+
+                # Log metric on training dataset at step and link to LoggedModel
+                mlflow.log_metric(
+                    "accuracy",
+                    compute_accuracy(scripted_model, X_train, y_train),
+                    epoch,
+                    model_id=model_info.model_id,
+                    dataset=train_dataset,  # type: ignore
+                )
