@@ -5,7 +5,6 @@ import mlflow.pytorch
 import pandas as pd
 import torch
 from mlflow.data import pandas_dataset
-from mlflow.entities import Dataset
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from torch import nn
@@ -50,9 +49,7 @@ def main() -> None:
     # Start a run to represent the training job
     with mlflow.start_run() as _run:
         # Load the training dataset with MLflow and link training metrics
-        train_dataset = Dataset(
-            pandas_dataset.from_pandas(train_df, name="train")
-        )  # type: ignore
+        train_dataset = pandas_dataset.from_pandas(train_df, name="train")
         X_train, y_train = prepare_data(train_dataset.df)  # type: ignore
 
         criterion = nn.CrossEntropyLoss()
@@ -69,13 +66,20 @@ def main() -> None:
             optimizer.step()
 
             if epoch % 10 == 0:
+                # Log model on CPU to avoid signature error
+                model_cpu = scripted_model.to("cpu")
+                input_example = X_train.cpu().numpy()
+
                 # Each newly created LoggedModel checkpoint is linked with its name and step
                 model_info = mlflow.pytorch.log_model(  # type: ignore
-                    pytorch_model=scripted_model,
+                    pytorch_model=model_cpu,
                     name=f"torch-iris-{epoch}",
                     step=epoch,
-                    input_example=X_train.numpy(),
+                    input_example=input_example,
                 )
+
+                # Move the model back to the device
+                scripted_model = scripted_model.to(device)
 
                 # Log params to the run, LoggedModel inherits those params
                 mlflow.log_params({
