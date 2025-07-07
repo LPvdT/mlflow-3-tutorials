@@ -112,6 +112,9 @@ extend-ignore = [
 
     # Argument name should be lowercase
     "N803",
+
+    # Found commented-out code
+    "ERA001",
 ]
 
 fixable = [
