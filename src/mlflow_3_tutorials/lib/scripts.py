@@ -34,6 +34,7 @@ def start_tracking_server() -> None:
     run_command(
         f"mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}",
         f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT}",
+        timeout=None,
     )
 
 
