@@ -1,0 +1,55 @@
+# Taskfile.yml
+version: '3'
+
+vars:
+  PY: poetry run # or 'python -m'
+
+tasks:
+  # ── Repository commands ────────────────────────
+  sync:
+    desc: Install all dependencies (optionally extra packages)
+    cmds:
+      - '{{.PY}} run_sync {{.EXTRAS | default ""}}'
+
+  precommit:
+    desc: Run pre‑commit hooks
+    cmds:
+      - '{{.PY}} run_precommit'
+
+  pyment:
+    desc: Format all docstrings
+    cmds:
+      - '{{.PY}} run_pyment'
+
+  # ── MLflow commands ────────────────────────────
+  start-server:
+    desc: Launch local MLflow tracking server
+    cmds:
+      - '{{.PY}} start_server'
+
+  rm-experiments:
+    desc: Delete all MLflow experiments except 0
+    cmds:
+      - '{{.PY}} remove_experiments'
+
+  serve-model:
+    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
+    vars: { VERSION: 1, PORT: 5002 }
+    cmds:
+      - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.PORT}}'
+
+  # ── Project tutorials ──────────────────────────
+  first-model:
+    desc: Run first model notebook pipeline
+    cmds:
+      - '{{.PY}} first_model'
+
+  tuning:
+    desc: Hyper‑parameter tuning + deployment
+    cmds:
+      - '{{.PY}} tuning_deployment'
+
+  deep-learning:
+    desc: Quick‑start deep‑learning example
+    cmds:
+      - '{{.PY}} deep_learning'
