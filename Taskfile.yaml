@@ -1,13 +1,18 @@
 version: '3'
 
 vars:
-  PY: python -m
+  PY:
+    sh: |
+      if command -v uv >/dev/null 2>&1; then
+        echo "uv run"
+      else
+        echo "python -m"
+      fi
 
 tasks:
   default:
-    desc: Show available tasks
-    cmds:
-      - task --summary
+    cmds: ['task --list']
+    silent: true
 
   # ── Repository commands ───────────────────────────────
   sync:
@@ -36,13 +41,13 @@ tasks:
       - '{{.PY}} start_server'
 
   rm-experiments:
-    desc: Delete all MLflow experiments except 0
+    desc: Delete all MLflow experiments except 0
     aliases: [rmx]
     cmds:
       - '{{.PY}} remove_experiments'
 
   serve-model:
-    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
+    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
     vars: { VERSION: 1, PORT: 5002 }
     aliases: [serve]
     cmds:
@@ -50,13 +55,13 @@ tasks:
 
   # ── Project tutorials ─────────────────────────────────
   first-model:
-    desc: Run first model notebook pipeline
+    desc: Run first‑model notebook pipeline
     aliases: [fm]
     cmds:
       - '{{.PY}} first_model'
 
   tuning:
-    desc: Hyper‑parameter tuning + deployment
+    desc: Hyper‑parameter tuning + deployment
     aliases: [td]
     cmds:
       - '{{.PY}} tuning_deployment'
