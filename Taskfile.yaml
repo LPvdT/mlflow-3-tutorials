@@ -1,3 +1,5 @@
+# This file defines tasks for managing the MLflow 3 Tutorials project.
+
 version: '3'
 
 vars:
@@ -14,7 +16,7 @@ tasks:
     cmds: [task --list]
     silent: true
 
-  # ── Repository commands ───────────────────────────────
+  # Repository commands
   sync:
     desc: Install all dependencies (optionally extra packages)
     aliases: [s]
@@ -31,7 +33,7 @@ tasks:
     cmds:
       - '{{.PY}} run_pyment'
 
-  # ── MLflow commands ───────────────────────────────────
+  # MLflow commands
   start-server:
     desc: Launch local MLflow tracking server
     aliases: [mlflow]
@@ -49,7 +51,7 @@ tasks:
     cmds:
       - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.PORT}}'
 
-  # ── Project tutorials ─────────────────────────────────
+  # Project tutorials
   first-model:
     desc: Run first-model notebook pipeline
     aliases: [fm]
