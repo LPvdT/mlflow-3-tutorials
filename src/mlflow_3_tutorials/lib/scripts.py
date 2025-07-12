@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 from loguru import logger
 
@@ -11,91 +12,74 @@ from mlflow_3_tutorials.lib.runner import run_command
 
 
 def start_tracking_server() -> None:
-    """
-    Start an MLflow tracking server on http://{SERVER_ADDRESS}:{SERVER_PORT}.
+    """Start an MLflow tracking server."""
 
-    This function runs the command `mlflow server --host {SERVER_ADDRESS} --port {SERVER_PORT}` and logs the result.
-    """
-
+    url = f"http://{SERVER_ADDRESS}:{SERVER_PORT}"
     run_command(
-        f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT} "
-        # f"--backend-store-uri={BACKEND_STORE} --default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        "mlflow server "
+        f"--host={SERVER_ADDRESS} "
+        f"--port={SERVER_PORT} "
         f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-        f"MLflow tracking server: http://{SERVER_ADDRESS}:{SERVER_PORT} - "
-        # f"backend-store-uri={BACKEND_STORE} default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-        f"default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-        timeout=None,
+        f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
     )
 
 
-def uv_sync() -> None:
-    """
-    Run the command `uv sync --managed-python --all-groups`
-    to install the project's dependencies.
+def uv_sync(
+    extras: list[Literal["tensorflow", "pytorch", "mlflow_extras"]]
+    | None = None,
+) -> None:
+    """Install project dependencies using uv."""
 
-    This function logs the result of the command.
-    """
-
+    extras_str = (
+        " ".join(f"--extra {extra}" for extra in extras) if extras else ""
+    )
+    description = f"uv sync [{' '.join(extras)}]" if extras else "uv sync"
     run_command(
-        "uv sync --managed-python --all-groups",
-        "uv sync",
+        f"uv sync --managed-python --all-groups {extras_str}",
+        description,
     )
 
 
 def run_pyment(style: str = "google") -> None:
-    """
-    Run the `pyment` docstring formatter with the specified style.
-
-    This function logs the result of the command.
-
-    Args:
-        style (str): The docstring style to format with, defaults to 'google'.
-    """
+    """Format docstrings using pyment."""
 
     run_command(
         f"pyment -f false -o {style} .",
-        "pyment docstring formatter",
+        f"Format docstrings with pyment ({style})",
     )
 
 
 def run_precommit() -> None:
-    """
-    Run the `pre-commit` hooks for the project.
+    """Run pre-commit hooks."""
 
-    This function runs the following commands in order to update the `pre-commit`
-    configuration and run all `pre-commit` hooks:
-
-    - `pre-commit autoupdate`: Update the pre-commit configuration.
-    - `pre-commit run -a`: Run all pre-commit hooks.
-    """
-
-    commands = {
-        "pre-commit autoupdate": "Update the pre-commit configuration",
-        "pre-commit run -a": "Run all pre-commit hooks",
-    }
-
-    for cmd, desc in commands.items():
+    steps = [
+        ("pre-commit autoupdate", "Update the pre-commit configuration"),
+        ("pre-commit run -a", "Run all pre-commit hooks"),
+    ]
+    for cmd, desc in steps:
         run_command(cmd, desc, check=False, show_output=True)
 
 
 def remove_all_experiments() -> None:
-    experiment_ids = [
+    """Delete all MLflow experiments except experiment '0'."""
+
+    to_delete = [
         p
-        for p in Path().cwd().rglob(r"mlruns/*")
+        for p in Path().cwd().rglob("mlruns/*")
         if (p.name.isdigit() and p.name != "0") or p.name == ".trash"
     ]
 
-    if not experiment_ids:
+    if not to_delete:
         logger.info("No experiments to delete")
         return
 
-    for exp in experiment_ids:
-        if exp.name == ".trash":
-            run_command(f"rm -rf {exp}", "Remove .trash directory")
+    for path in to_delete:
+        if path.name == ".trash":
+            run_command(f"rm -rf {path}", "Remove .trash directory")
         else:
             run_command(
-                f"mlflow experiments delete -x {exp.name}",
-                f"Remove experiment: {exp.name}",
+                f"mlflow experiments delete -x {path.name}",
+                f"Remove experiment: {path.name}",
             )
 
 
@@ -104,7 +88,10 @@ def serve_wine_model(
     version: int = 1,
     port: int = 5002,
 ) -> None:
+    """Serve the specified MLflow model version."""
+
     run_command(
-        f'mlflow models serve -m "models:/{model_name}/{version}" --port {port} --env-manager local',
+        f'mlflow models serve -m "models:/{model_name}/{version}" '
+        f"--port {port} --env-manager local",
         f"Serving: '{model_name}' - version {version}",
     )

@@ -15,8 +15,7 @@ SERVER_PORT: Final[int]
 TRACKING_PORT: Final[int]
 SERVER_PORT = TRACKING_PORT = 5000
 
-# MLflow backend store and default artifact root
-BACKEND_STORE: Final[str] = "sqlite:///mlflow.db"
+# MLflow default artifact root
 DEFAULT_ARTIFACT_ROOT: Final[str] = "./mlruns"
 
 # MLflow tracking URI
