@@ -21,7 +21,7 @@ tasks:
     cmds: ['{{.PY}} run_sync {{.EXTRAS | default ""}}']
 
   precommit:
-    desc: Run pre‑commit hooks
+    desc: Run pre-commit hooks
     aliases: [pc]
     cmds: ['{{.PY}} run_precommit']
 
@@ -38,29 +38,29 @@ tasks:
     cmds: ['{{.PY}} start_server']
 
   rm-experiments:
-    desc: Delete all MLflow experiments except 0
+    desc: Delete all MLflow experiments except 0
     aliases: [rmx]
     cmds: ['{{.PY}} remove_experiments']
 
   serve-model:
-    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
-    vars: {VERSION: 1, PORT: 5002}
+    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
+    vars: { VERSION: 1, PORT: 5002 }
     aliases: [serve]
     cmds:
       - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.PORT}}'
 
   # ── Project tutorials ─────────────────────────────────
   first-model:
-    desc: Run first‑model notebook pipeline
+    desc: Run first-model notebook pipeline
     aliases: [fm]
     cmds: ['{{.PY}} first_model']
 
   tuning:
-    desc: Hyper‑parameter tuning + deployment
+    desc: Hyper-parameter tuning + deployment
     aliases: [td]
     cmds: ['{{.PY}} tuning_deployment']
 
   deep-learning:
-    desc: Quick‑start deep‑learning example
+    desc: Quick-start deep-learning example
     aliases: [dl]
     cmds: ['{{.PY}} deep_learning']
