@@ -33,6 +33,12 @@ tasks:
     cmds:
       - '{{.PY}} run_pyment'
 
+  # Test commands
+  test:
+    desc: Run tests with coverage report
+    cmds:
+      - pytest --cov --cov-report html
+
   # MLflow commands
   start-server:
     desc: Launch local MLflow tracking server
