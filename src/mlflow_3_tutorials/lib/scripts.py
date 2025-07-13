@@ -21,6 +21,7 @@ def start_tracking_server() -> None:
         f"--port={SERVER_PORT} "
         f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        None,
     )
 
 
@@ -81,17 +82,3 @@ def remove_all_experiments() -> None:
                 f"mlflow experiments delete -x {path.name}",
                 f"Remove experiment: {path.name}",
             )
-
-
-def serve_wine_model(
-    model_name: str = "wine-quality-predictor",
-    version: int = 1,
-    port: int = 5002,
-) -> None:
-    """Serve the specified MLflow model version."""
-
-    run_command(
-        f'mlflow models serve -m "models:/{model_name}/{version}" '
-        f"--port {port} --env-manager local",
-        f"Serving: '{model_name}' - version {version}",
-    )
