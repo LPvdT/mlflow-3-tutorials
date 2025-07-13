@@ -30,6 +30,7 @@ first_model = "mlflow_3_tutorials.first_model:main"
 tuning_deployment = "mlflow_3_tutorials.tuning_deployment:main"
 serve_wine_model = "mlflow_3_tutorials.lib.scripts:serve_wine_model"
 deep_learning = "mlflow_3_tutorials.deep_learning_quickstart:main"
+model_registry = "mlflow_3_tutorials.model_registry_quickstart:main"
 
 [project.optional-dependencies]
 tensorflow = [
