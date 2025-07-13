@@ -58,7 +58,7 @@ tasks:
     cmds: ['{{.PY}} start_server']
 
   mlflow:remove-experiments:
-    desc: Delete all MLflow experiments except 0
+    desc: Delete all MLflow experiments except 0 (-- -a/--all removes mlflow/)
     aliases: [rmx]
     deps: [mlflow:start-server]
     cmds: ['{{.PY}} remove_experiments {{.CLI_ARGS}}']
