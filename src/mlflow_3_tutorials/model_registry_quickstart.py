@@ -43,6 +43,39 @@ def main() -> None:
             registered_model_name="sk-learn-random-forest-reg-model",
         )
 
+        # Set alias and tags
+        client = mlflow.MlflowClient()
+        client.set_registered_model_alias(
+            "sk-learn-random-forest-reg-model", "the_best_model_ever", "1"
+        )
+        client.set_model_version_tag(
+            "sk-learn-random-forest-reg-model",
+            "1",
+            "problem_type",
+            "regression",
+        )
+        mv = client.get_model_version_by_alias(
+            "sk-learn-random-forest-reg-model", "the_best_model_ever"
+        )
+        logger.info(mv.tags)
+
+        # Loadmodel from registry using alias
+        model_name = "sk-learn-random-forest-reg-model"
+        model_alias = "the_best_model_ever"
+        model_uri = f"models:/{model_name}@{model_alias}"
+
+        logger.info(f"Loading model from: {model_uri}...")
+        model_loaded = mlflow.sklearn.load_model(model_uri=model_uri)  # type: ignore
+        logger.info(model_loaded)
+
+        # Generate a new dataset for prediction and predict
+        X_new, _ = make_regression(  # type: ignore
+            n_features=4, n_informative=2, random_state=0, shuffle=False
+        )
+        y_pred_new = model_loaded.predict(X_new)  # type: ignore
+
+        logger.info(f"Predictions: {as_json(y_pred_new[:10].tolist())}")
+
 
 if __name__ == "__main__":
     main()
