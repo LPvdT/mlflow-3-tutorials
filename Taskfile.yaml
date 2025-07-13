@@ -15,6 +15,7 @@ vars:
 
 tasks:
   default:
+    desc: List available tasks
     cmds: [task --list]
     silent: true
 
@@ -59,9 +60,11 @@ tasks:
     cmds: ['{{.PY}} start_server']
 
   mlflow:rm-experiments:
-    desc: Delete all MLflow experiments except 0
+    desc: >
+      Delete all MLflow experiments except 0.
+      (`task rmx -- --all/-a` removes mlflow/)
     aliases: [rmx]
-    cmds: ['{{.PY}} remove_experiments']
+    cmds: ['{{.PY}} remove_experiments {{.CLI_ARGS}}']
     deps:
       - mlflow:start-server
 
