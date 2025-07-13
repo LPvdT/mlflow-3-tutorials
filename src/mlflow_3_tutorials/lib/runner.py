@@ -7,7 +7,7 @@ from loguru import logger
 def run_command(
     cmd_str: str,
     description: str | None = None,
-    timeout: int = 5,
+    timeout: float | None = 5.0,
     *,
     check: bool = True,
     show_output: bool = False,
@@ -18,7 +18,7 @@ def run_command(
     Args:
         cmd_str (str): The full command string to execute.
         description (str | None): Optional description for logging context.
-        timeout (int): Time in seconds before the command times out.
+        timeout (float): Time in seconds before the command times out.
         check (bool): If True, raise an exception for non-zero exit codes.
         show_output (bool): If True, log stdout and stderr regardless of result.
     """
