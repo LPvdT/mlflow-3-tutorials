@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -62,7 +63,23 @@ def run_precommit() -> None:
 
 
 def remove_all_experiments() -> None:
-    """Delete all MLflow experiments except experiment '0'."""
+    """
+    Remove all MLflow experiments.
+
+    If the '--all' or '-a' option is specified as a command-line argument,
+    deletes the entire 'mlruns/' directory. Otherwise, it identifies and deletes
+    individual experiment directories (excluding '0') and the '.trash' directory
+    if they exist within the 'mlruns/' path.
+
+    Logs a message if no experiments are found to delete.
+    """
+
+    if sys.argv[1] == "--all" or sys.argv[1] == "-a":
+        run_command(
+            "rm -rf mlruns/",
+            f"Remove MLflow tracking directory: {DEFAULT_ARTIFACT_ROOT}",
+        )
+        return
 
     to_delete = [
         p
