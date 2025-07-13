@@ -95,3 +95,9 @@ tasks:
     aliases: [mr]
     deps: [mlflow:start-server]
     cmds: ['{{.PY}} model_registry']
+
+  proj:optuna-tuning-tracking:
+    desc: Optuna hyperparameter tuning + tracking (nested) runs
+    aliases: [ot]
+    deps: [mlflow:start-server]
+    cmds: ['{{.PY}} optuna_tuning_tracking']
