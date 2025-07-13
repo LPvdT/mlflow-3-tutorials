@@ -10,11 +10,21 @@ vars:
       else
         echo "python -m"
       fi
+  HOST: 127.0.0.1
+  PORT: 5000
 
 tasks:
   default:
     cmds: [task --list]
     silent: true
+
+  int:address-free:
+    desc: Check if port {{.HOST}}:{{.PORT}} is free
+    aliases: [free]
+    internal: true
+    cmds:
+      - cmd: '{{.PY}} port_free'
+        silent: true
 
   # Repository commands
   repo:sync:
@@ -44,6 +54,7 @@ tasks:
   mlflow:start-server:
     desc: Launch local MLflow tracking server
     aliases: [mlflow]
+    status: [free]
     cmds: ['{{.PY}} start_server']
 
   mlflow:rm-experiments:
@@ -81,5 +92,12 @@ tasks:
     desc: Quick-start deep-learning example
     aliases: [dl]
     cmds: ['{{.PY}} deep_learning']
+    deps:
+      - mlflow:start-server
+
+  proj:model-registry:
+    desc: Quick-start model-registry example
+    aliases: [mr]
+    cmds: ['{{.PY}} model_registry']
     deps:
       - mlflow:start-server
