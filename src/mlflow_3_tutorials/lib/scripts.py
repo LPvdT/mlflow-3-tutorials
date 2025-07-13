@@ -1,3 +1,4 @@
+import sys
 from pathlib import Path
 from typing import Literal
 
@@ -21,6 +22,7 @@ def start_tracking_server() -> None:
         f"--port={SERVER_PORT} "
         f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
         f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        None,
     )
 
 
@@ -61,7 +63,23 @@ def run_precommit() -> None:
 
 
 def remove_all_experiments() -> None:
-    """Delete all MLflow experiments except experiment '0'."""
+    """
+    Remove all MLflow experiments.
+
+    If the '--all' or '-a' option is specified as a command-line argument,
+    deletes the entire 'mlruns/' directory. Otherwise, it identifies and deletes
+    individual experiment directories (excluding '0') and the '.trash' directory
+    if they exist within the 'mlruns/' path.
+
+    Logs a message if no experiments are found to delete.
+    """
+
+    if sys.argv[1] == "--all" or sys.argv[1] == "-a":
+        run_command(
+            "rm -rf mlruns/",
+            f"Remove MLflow tracking directory: {DEFAULT_ARTIFACT_ROOT}",
+        )
+        return
 
     to_delete = [
         p
@@ -81,17 +99,3 @@ def remove_all_experiments() -> None:
                 f"mlflow experiments delete -x {path.name}",
                 f"Remove experiment: {path.name}",
             )
-
-
-def serve_wine_model(
-    model_name: str = "wine-quality-predictor",
-    version: int = 1,
-    port: int = 5002,
-) -> None:
-    """Serve the specified MLflow model version."""
-
-    run_command(
-        f'mlflow models serve -m "models:/{model_name}/{version}" '
-        f"--port {port} --env-manager local",
-        f"Serving: '{model_name}' - version {version}",
-    )

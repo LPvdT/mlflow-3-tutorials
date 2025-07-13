@@ -10,76 +10,88 @@ vars:
       else
         echo "python -m"
       fi
+  HOST: 127.0.0.1
+  PORT: 5000
 
 tasks:
   default:
+    desc: List available tasks
     cmds: [task --list]
     silent: true
 
-  # Repository commands
+  # Interal commands
+  int:address-free:
+    desc: Ensure {{.HOST}}:{{.PORT}} is free
+    aliases: [free]
+    internal: true
+    cmds:
+      - cmd: '{{.PY}} port_free'
+        silent: true
+
+  # Repository management commands
   repo:sync:
     desc: Install all dependencies (optionally extra packages)
     aliases: [sync]
     cmds: ['{{.PY}} run_sync {{.EXTRAS | default ""}}']
 
-  repo:precommit:
-    desc: Run pre-commit hooks
+  repo:pre-commit:
+    desc: Run pre‑commit hooks
     aliases: [pc]
     cmds: ['{{.PY}} run_precommit']
 
-  repo:pyment:
-    desc: Format all docstrings
+  repo:format-docs:
+    desc: Format all docstrings with Pyment
     aliases: [fmt]
-    cmds:
-      - '{{.PY}} run_pyment'
+    cmds: ['{{.PY}} run_pyment']
 
-  # Test commands
-  test:cov:
-    desc: Run tests with coverage report
+  # Tests commands
+  test:coverage:
+    desc: Run tests with coverage and generate HTML report
     aliases: [cov]
-    cmds:
-      - pytest --cov --cov-report html
+    cmds: [pytest --cov --cov-report=html]
 
   # MLflow commands
   mlflow:start-server:
     desc: Launch local MLflow tracking server
     aliases: [mlflow]
+    status: [free]
     cmds: ['{{.PY}} start_server']
 
-  mlflow:rm-experiments:
+  mlflow:remove-experiments:
     desc: Delete all MLflow experiments except 0
     aliases: [rmx]
-    cmds: ['{{.PY}} remove_experiments']
-    deps:
-      - mlflow:start-server
+    deps: [mlflow:start-server]
+    cmds: ['{{.PY}} remove_experiments {{.CLI_ARGS}}']
 
-  mlflow:serve-model:
-    desc: Serve the Wine model (VERSION defaults to 1, PORT=5002)
-    vars: { VERSION: 1, PORT: 5002 }
+  mlflow:serve-wine:
+    desc: Serve the Wine model
+    vars: { VERSION: 1, SERVE_PORT: 5002 }
     aliases: [serve]
+    deps: [mlflow:start-server]
     cmds:
-      - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.PORT}}'
-    deps:
-      - mlflow:start-server
+      - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.SERVE_PORT}}'
 
   # Project tutorials
   proj:first-model:
     desc: Run first-model notebook pipeline
     aliases: [fm]
+    deps: [mlflow:start-server]
     cmds: ['{{.PY}} first_model']
-    deps:
-      - mlflow:start-server
 
   proj:tuning:
-    desc: Hyper-parameter tuning + deployment
+    desc: Hyper‑parameter tuning + deployment
     aliases: [td]
+    deps: [mlflow:start-server]
     cmds: ['{{.PY}} tuning_deployment']
-    deps:
-      - mlflow:start-server
 
   proj:deep-learning:
-    desc: Quick-start deep-learning example
+    desc: Quick‑start deep‑learning example
     aliases: [dl]
+    deps: [mlflow:start-server]
     cmds: ['{{.PY}} deep_learning']
-    deps:
-      - mlflow:start-server
+
+  proj:model-registry:
+    desc: Quick‑start model‑registry example
+    aliases: [mr]
+    deps: [mlflow:start-server]
+    cmds: ['{{.PY}} model_registry']
