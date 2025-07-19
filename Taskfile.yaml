@@ -18,15 +18,6 @@ tasks:
     cmds: [task --list]
     silent: true
 
-  # Interal commands
-  int:address-free:
-    desc: Ensure {{.HOST}}:{{.PORT}} is free
-    aliases: [free]
-    internal: true
-    cmds:
-      - cmd: '{{.PY}} port_free'
-        silent: true
-
   # Repository management commands
   repo:sync:
     desc: Install all dependencies (optionally extra packages)
@@ -50,16 +41,25 @@ tasks:
     cmds: [pytest --cov --cov-report=html]
 
   # MLflow commands
+  mlflow:stop-server:
+    desc: Stop local MLflow tracking server
+    aliases: [stop]
+    cmds:
+      - cmd: |
+          pid=$(pgrep -f mlflow.server:app)
+          if [ -n "$pid" ]; then
+            kill $pid
+          fi
+
   mlflow:start-server:
     desc: Launch local MLflow tracking server
     aliases: [mlflow]
-    status: [free]
-    cmds: ['{{.PY}} start_server']
+    cmds:
+      - '{{.PY}} start_server'
 
   mlflow:remove-experiments:
     desc: Delete all MLflow experiments except 0 (-- -a/--all removes mlflow/)
     aliases: [rmx]
-    deps: [mlflow:start-server]
     cmds: ['{{.PY}} remove_experiments {{.CLI_ARGS}}']
 
   mlflow:serve-wine:
@@ -74,29 +74,25 @@ tasks:
   proj:first-model:
     desc: Run first-model notebook pipeline
     aliases: [fm]
-    deps: [mlflow:start-server]
-    cmds: ['{{.PY}} first_model']
+    cmds:
+      - '{{.PY}} first_model'
 
   proj:tuning:
     desc: Hyper‑parameter tuning + deployment
     aliases: [td]
-    deps: [mlflow:start-server]
     cmds: ['{{.PY}} tuning_deployment']
 
   proj:deep-learning:
     desc: Quick‑start deep‑learning example
     aliases: [dl]
-    deps: [mlflow:start-server]
     cmds: ['{{.PY}} deep_learning']
 
   proj:model-registry:
     desc: Quick‑start model‑registry example
     aliases: [mr]
-    deps: [mlflow:start-server]
     cmds: ['{{.PY}} model_registry']
 
   proj:optuna-tuning-tracking:
     desc: Optuna hyperparameter tuning + tracking (nested) runs
     aliases: [ot]
-    deps: [mlflow:start-server]
     cmds: ['{{.PY}} optuna_tuning_tracking']
