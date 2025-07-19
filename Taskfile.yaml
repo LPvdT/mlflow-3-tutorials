@@ -15,84 +15,79 @@ vars:
 
 tasks:
   default:
-    cmds: [task --list]
+    cmd: task --list
     silent: true
 
   # Repository management commands
   repo:sync:
     desc: Install all dependencies (optionally extra packages)
     aliases: [sync]
-    cmds: ['{{.PY}} run_sync {{.EXTRAS | default ""}}']
+    cmd: '{{.PY}} run_sync {{.EXTRAS | default ""}}'
 
   repo:pre-commit:
     desc: Run pre‑commit hooks
     aliases: [pc]
-    cmds: ['{{.PY}} run_precommit']
+    cmd: '{{.PY}} run_precommit'
 
   repo:format-docs:
     desc: Format all docstrings with Pyment
     aliases: [fmt]
-    cmds: ['{{.PY}} run_pyment']
+    cmd: '{{.PY}} run_pyment'
 
   # Tests commands
   test:coverage:
     desc: Run tests with coverage and generate HTML report
     aliases: [cov]
-    cmds: [pytest --cov --cov-report=html]
+    cmd: pytest --cov --cov-report=html
 
   # MLflow commands
   mlflow:stop-server:
     desc: Stop local MLflow tracking server
     aliases: [stop]
-    cmds:
-      - cmd: |
-          pid=$(pgrep -f mlflow.server:app)
-          if [ -n "$pid" ]; then
-            kill $pid
-          fi
+    cmd: |
+      pid=$(pgrep -f mlflow.server:app)
+      if [ -n "$pid" ]; then
+        kill $pid
+      fi
 
   mlflow:start-server:
     desc: Launch local MLflow tracking server
     aliases: [mlflow]
-    cmds:
-      - '{{.PY}} start_server'
+    cmd: '{{.PY}} start_server'
 
   mlflow:remove-experiments:
     desc: Delete all MLflow experiments except 0 (-- -a/--all removes mlflow/)
     aliases: [rmx]
-    cmds: ['{{.PY}} remove_experiments {{.CLI_ARGS}}']
+    cmd: '{{.PY}} remove_experiments {{.CLI_ARGS}}'
 
   mlflow:serve-wine:
     desc: Serve the Wine model
     vars: { VERSION: 1, SERVE_PORT: 5002 }
     aliases: [serve]
-    deps: [mlflow:start-server]
-    cmds:
-      - '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.SERVE_PORT}}'
+    cmd: '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.SERVE_PORT}}'
 
   # Project tutorials
   proj:first-model:
     desc: Run first-model notebook pipeline
     aliases: [fm]
-    cmds:
-      - '{{.PY}} first_model'
+    cmd: '{{.PY}} first_model'
 
   proj:tuning:
-    desc: Hyper‑parameter tuning + deployment
+    desc: Hyper-parameter tuning + deployment
     aliases: [td]
-    cmds: ['{{.PY}} tuning_deployment']
+    cmd: '{{.PY}} tuning_deployment'
 
   proj:deep-learning:
-    desc: Quick‑start deep‑learning example
+    desc: Quick-start deep-learning example
     aliases: [dl]
-    cmds: ['{{.PY}} deep_learning']
+    cmd: '{{.PY}} deep_learning'
 
   proj:model-registry:
-    desc: Quick‑start model‑registry example
+    desc: Quick-start model-registry example
     aliases: [mr]
-    cmds: ['{{.PY}} model_registry']
+    cmd: '{{.PY}} model_registry'
 
   proj:optuna-tuning-tracking:
     desc: Optuna hyperparameter tuning + tracking (nested) runs
     aliases: [ot]
-    cmds: ['{{.PY}} optuna_tuning_tracking']
+    cmd: '{{.PY}} optuna_tuning_tracking'
