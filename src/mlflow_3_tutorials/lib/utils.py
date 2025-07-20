@@ -13,6 +13,7 @@ import seaborn as sns
 import xgboost
 from loguru import logger
 from matplotlib.figure import Figure
+from optuna.integration import XGBoostPruningCallback
 from sklearn.metrics import mean_squared_error
 
 
@@ -396,7 +397,15 @@ def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
             )
 
         # Train XGBoost model
-        bst = xgboost.train(params, kwargs["dtrain"])
+        bst = xgboost.train(
+            params,
+            kwargs["dtrain"],
+            evals=[
+                (kwargs["dvalid"], "validation"),
+                (kwargs["dtrain"], "train"),
+            ],
+            callbacks=[XGBoostPruningCallback(trial, "validation-rmse")],
+        )
         preds = bst.predict(kwargs["dvalid"])
         error = mean_squared_error(kwargs["y_valid"], preds)
 
