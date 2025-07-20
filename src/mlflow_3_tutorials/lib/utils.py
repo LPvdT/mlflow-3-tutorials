@@ -140,10 +140,7 @@ def generate_apple_sales_data_with_promo_adjustment(
     ) * data_sales["inflation_multiplier"]
 
     # Previous day's demand (fill with next day's value for first entry)
-    data_sales["previous_days_demand"] = data_sales["demand"].shift(1)
-    data_sales["previous_days_demand"] = data_sales[
-        "previous_days_demand"
-    ].fillna(method="bfill")
+    data_sales["previous_days_demand"] = data_sales["demand"].shift(1).bfill()
 
     # Competitor pricing
     data_sales["competitor_price_per_kg"] = rng.uniform(0.5, 3.0, n_rows)
@@ -152,7 +149,7 @@ def generate_apple_sales_data_with_promo_adjustment(
     ) * competitor_price_effect
 
     # Stock availability (lagged)
-    price_lag_3 = data_sales["price_per_kg"].shift(3).fillna(method="bfill")
+    price_lag_3 = data_sales["price_per_kg"].shift(3).bfill()
     stock_available = -np.log(price_lag_3 + 1) + 2
     data_sales["stock_available"] = np.clip(stock_available, 0.7, 1)
 
