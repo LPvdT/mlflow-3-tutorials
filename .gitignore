@@ -21,6 +21,7 @@ todo.md
 # MLflow
 mlruns/
 mlflow.db
+loaded_model/
 
 # Artifacts
 *.png
