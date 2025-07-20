@@ -1,11 +1,20 @@
 import json
+import math
 from datetime import datetime
 from typing import Any
 
+import matplotlib.pyplot as plt
+import mlflow
 import numpy as np
+import optuna
 import pandas as pd
 import pytz
+import seaborn as sns
+import xgboost
 from loguru import logger
+from matplotlib.figure import Figure
+from optuna.integration import XGBoostPruningCallback
+from sklearn.metrics import mean_squared_error
 
 
 def as_json(obj: object, *, indent: int = 2) -> str:
@@ -35,16 +44,45 @@ def as_json(obj: object, *, indent: int = 2) -> str:
 
 
 def generate_apple_sales_data_with_promo_adjustment(
-    base_demand: int = 1000,
-    n_rows: int = 5000,
+    base_demand: int = 1_000,
+    n_rows: int = 5_000,
+    competitor_price_effect: float = -50.0,
 ) -> pd.DataFrame:
     """
-    Generates a DataFrame containing synthetic apple sales data with promotional adjustments.
+    Generates a synthetic dataset for predicting apple sales demand with multiple influencing factors.
+
+    This function creates a pandas DataFrame with features relevant to apple sales.
+    The features include date, average_temperature, rainfall, weekend flag, holiday flag, promotional flag,
+    price_per_kg, competitor's price, marketing intensity, stock availability, and the previous day's demand.
+    The target variable, 'demand', is generated based on a combination of these features with some added noise.
+
+    Args:
+        base_demand (int, optional): Base demand for apples. Defaults to 1000.
+        n_rows (int, optional): Number of rows (days) of data to generate. Defaults to 5000.
+        competitor_price_effect (float, optional): Effect of competitor's price being lower on our sales.
+                                                    Defaults to -50.
+
+    Returns:
+        pd.DataFrame: DataFrame with features and target variable for apple sales prediction.
+
+    Example:
+    >>> df = generate_apple_sales_data_with_promo_adjustment(base_demand=1200, n_rows=6000)
+    >>> df.head()
     """
 
     rng = np.random.default_rng(9999)
 
-    # Create date range (vectorized)
+    # Constants
+    WEEKENED_DAY_START = 5  # Saturday
+    HARVEST_PRICE_IMPACT = 0.5
+    PRICE_SENSITIVITY = -50
+    HARVEST_EFFECT_MULTIPLIER = 50
+    PROMO_BOOST = 200
+    WEEKEND_BOOST = 300
+    STOCK_THRESHOLD = 0.95
+    MARKETING_DURATION = 7
+
+    # Date range
     dates = pd.date_range(
         end=datetime.now(tz=pytz.timezone("Europe/Amsterdam")),
         periods=n_rows,
@@ -56,13 +94,13 @@ def generate_apple_sales_data_with_promo_adjustment(
         "date": dates,
         "average_temperature": rng.uniform(5, 30, n_rows),
         "rainfall": rng.exponential(5, n_rows),
-        "weekend": pd.Series(dates).dt.weekday >= 5,  # noqa
+        "weekend": pd.Series(dates).dt.weekday >= WEEKENED_DAY_START,
         "holiday": rng.choice([0, 1], n_rows, p=[0.97, 0.03]),
         "price_per_kg": rng.uniform(0.5, 3.0, n_rows),
         "month": pd.Series(dates).dt.month,
     })
 
-    # Vectorized calculations
+    # Inflation and seasonality
     year_min = data_sales["date"].dt.year.min()
     data_sales["inflation_multiplier"] = (
         1 + (data_sales["date"].dt.year - year_min) * 0.03
@@ -72,36 +110,312 @@ def generate_apple_sales_data_with_promo_adjustment(
         2 * np.pi * (data_sales["month"] - 3) / 12
     ) + np.sin(2 * np.pi * (data_sales["month"] - 9) / 12)
 
-    # Adjust price per kg based on harvest effect
-    data_sales["price_per_kg"] -= data_sales["harvest_effect"] * 0.5
+    # Adjust price using harvest effect
+    data_sales["price_per_kg"] -= (
+        data_sales["harvest_effect"] * HARVEST_PRICE_IMPACT
+    )
+    data_sales["price_per_kg"] = data_sales["price_per_kg"].clip(lower=0.1)
 
-    # Promo assignment (vectorized)
+    # Promotions
     peak_months = [4, 10]
-    data_sales["promo"] = 0
     is_peak_month = data_sales["month"].isin(peak_months)
+    data_sales["promo"] = 0
     data_sales.loc[is_peak_month, "promo"] = 1
     data_sales.loc[~is_peak_month, "promo"] = rng.choice(
-        [0, 1], (~is_peak_month).sum(), p=[0.85, 0.15]
+        [0, 1], size=(~is_peak_month).sum(), p=[0.85, 0.15]
     )
 
     # Calculate demand components
-    base_price_effect = -data_sales["price_per_kg"] * 50
-    seasonality_effect = data_sales["harvest_effect"] * 50
-    promo_effect = data_sales["promo"] * 200
+    price_penalty = data_sales["price_per_kg"] * PRICE_SENSITIVITY
+    seasonality = data_sales["harvest_effect"] * HARVEST_EFFECT_MULTIPLIER
+    promo_bonus = data_sales["promo"] * PROMO_BOOST
+    weekend_bonus = data_sales["weekend"].astype(int) * WEEKEND_BOOST
 
     data_sales["demand"] = (
         base_demand
-        + base_price_effect
-        + seasonality_effect
-        + promo_effect
-        + data_sales["weekend"].astype(int) * 300
+        + price_penalty
+        + seasonality
+        + promo_bonus
+        + weekend_bonus
         + rng.normal(0, 50, n_rows)
     ) * data_sales["inflation_multiplier"]
 
-    # Previous day's demand with fill backward for first row
+    # Previous day's demand (fill with next day's value for first entry)
     data_sales["previous_days_demand"] = data_sales["demand"].shift(1).bfill()
 
-    # Drop temporary columns
-    return data_sales.drop(
-        columns=["inflation_multiplier", "harvest_effect", "month"]
+    # Competitor pricing
+    data_sales["competitor_price_per_kg"] = rng.uniform(0.5, 3.0, n_rows)
+    data_sales["competitor_price_effect"] = (
+        data_sales["competitor_price_per_kg"] < data_sales["price_per_kg"]
+    ) * competitor_price_effect
+
+    # Stock availability (lagged)
+    price_lag_3 = data_sales["price_per_kg"].shift(3).bfill()
+    stock_available = -np.log(price_lag_3 + 1) + 2
+    data_sales["stock_available"] = np.clip(stock_available, 0.7, 1)
+
+    # Marketing intensity
+    data_sales["marketing_intensity"] = np.nan
+
+    high_stock_indices = data_sales[
+        data_sales["stock_available"] > STOCK_THRESHOLD
+    ].index
+
+    for idx in high_stock_indices:
+        end_idx = min(idx + MARKETING_DURATION - 1, n_rows - 1)
+        data_sales.loc[idx:end_idx, "marketing_intensity"] = rng.uniform(0.7, 1)
+
+    data_sales["marketing_intensity"] = data_sales[
+        "marketing_intensity"
+    ].fillna(pd.Series(rng.uniform(0, 0.5, n_rows), index=data_sales.index))
+
+    # Final demand adjustment
+    data_sales["demand"] += (
+        data_sales["competitor_price_effect"]
+        + data_sales["marketing_intensity"]
     )
+
+    # Cleanup
+    return data_sales.drop(
+        columns=[
+            "inflation_multiplier",
+            "harvest_effect",
+            "month",
+            "competitor_price_effect",
+            "stock_available",
+        ]
+    )
+
+
+def plot_correlation_with_demand(
+    df: pd.DataFrame, save_path: str | None = None
+) -> Figure:
+    """
+    Plots the correlation of each variable in the dataframe with the 'demand' column.
+
+    Args:
+        df (pd.DataFrame): DataFrame containing the data, including a 'demand' column.
+        save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
+
+    Returns:
+        None (Displays the plot on a Jupyter window)
+    """
+
+    # Compute correlations between all variables and 'demand'
+    correlations = df.corr()["demand"].drop("demand").sort_values()  # type: ignore
+
+    # Generate a color palette from red to green
+    colors = sns.diverging_palette(10, 130, as_cmap=True)
+    color_mapped = correlations.map(colors)
+
+    # Set Seaborn style
+    sns.set_style(
+        "whitegrid", {"axes.facecolor": "#c2c4c2", "grid.linewidth": 1.5}
+    )  # Light grey background and thicker grid lines
+
+    # Create bar plot
+    fig = plt.figure(figsize=(12, 8))
+    plt.barh(correlations.index, correlations.values, color=color_mapped)  # type: ignore
+
+    # Set labels and title with increased font size
+    plt.title("Correlation with Demand", fontsize=18)
+    plt.xlabel("Correlation Coefficient", fontsize=16)
+    plt.ylabel("Variable", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.grid(axis="x")
+
+    plt.tight_layout()
+
+    # Save the plot if save_path is specified
+    if save_path:
+        plt.savefig(save_path, format="png", dpi=600)
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_residuals(
+    model: xgboost.core.Booster,
+    dvalid: xgboost.core.DMatrix,
+    valid_y: pd.Series,
+    save_path: str | None = None,
+) -> Figure:
+    """
+    Plots the residuals of the model predictions against the true values.
+
+    Args:
+        model: The trained XGBoost model.
+        dvalid (xgb.DMatrix): The validation data in XGBoost DMatrix format.
+        valid_y (pd.Series): The true values for the validation set.
+        save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
+
+    Returns:
+        None (Displays the residuals plot on a Jupyter window)
+    """
+
+    # Predict using the model
+    preds = model.predict(dvalid)
+
+    # Calculate residuals
+    residuals = valid_y - preds
+
+    # Set Seaborn style
+    sns.set_style(
+        "whitegrid", {"axes.facecolor": "#c2c4c2", "grid.linewidth": 1.5}
+    )
+
+    # Create scatter plot
+    fig = plt.figure(figsize=(12, 8))
+    plt.scatter(valid_y, residuals, color="blue", alpha=0.5)
+    plt.axhline(y=0, color="r", linestyle="-")
+
+    # Set labels, title and other plot properties
+    plt.title("Residuals vs True Values", fontsize=18)
+    plt.xlabel("True Values", fontsize=16)
+    plt.ylabel("Residuals", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.grid(axis="y")
+
+    plt.tight_layout()
+
+    # Save the plot if save_path is specified
+    if save_path:
+        plt.savefig(save_path, format="png", dpi=600)
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_feature_importance(
+    model: xgboost.core.Booster, booster: str
+) -> Figure:
+    """
+    Plots feature importance for an XGBoost model.
+
+    Args:
+        model: A trained XGBoost model
+
+    Returns:
+        fig: The matplotlib figure object
+    """
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    importance_type = "weight" if booster == "gblinear" else "gain"
+    xgboost.plot_importance(
+        model,
+        importance_type=importance_type,
+        ax=ax,
+        title=f"Feature Importance based on {importance_type}",
+    )
+    plt.tight_layout()
+    plt.close(fig)
+
+    return fig
+
+
+def get_or_create_experiment(experiment_name: str) -> str:
+    """
+    Retrieve the ID of an existing MLflow experiment or create a new one if it doesn't exist.
+
+    This function checks if an experiment with the given name exists within MLflow.
+    If it does, the function returns its ID. If not, it creates a new experiment
+    with the provided name and returns its ID.
+
+    Parameters:
+        experiment_name (str): Name of the MLflow experiment.
+
+    Returns:
+        str: ID of the existing or newly created MLflow experiment.
+    """
+
+    if experiment := mlflow.get_experiment_by_name(experiment_name):
+        return experiment.experiment_id
+    return mlflow.create_experiment(experiment_name)
+
+
+def champion_callback(
+    study: optuna.Study, frozen_trial: optuna.trial.FrozenTrial
+) -> None:
+    """
+    Logging callback that will report when a new trial iteration improves upon existing
+    best trial values.
+
+    Note
+    ---
+
+    This callback is not intended for use in distributed computing systems such as Spark
+    or Ray due to the micro-batch iterative implementation for distributing trials to a cluster's
+    workers or agents.
+
+    The race conditions with file system state management for distributed trials will render
+    inconsistent values with this callback.
+    """
+
+    winner = study.user_attrs.get("winner", None)
+
+    if study.best_value and winner != study.best_value:
+        study.set_user_attr("winner", study.best_value)
+        if winner:
+            improvement_percentage = (
+                abs(winner - study.best_value) / study.best_value
+            ) * 100
+            logger.success(
+                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
+                f"{improvement_percentage: .4f}% improvement"
+            )
+        logger.debug(
+            f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value}"
+        )
+
+
+def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
+    error = 0.0
+
+    with mlflow.start_run(nested=True):
+        # Define hyperparameters
+        params = {
+            "objective": "reg:squarederror",
+            "eval_metric": "rmse",
+            "device": "gpu:0",  # Specify GPU device
+            "booster": trial.suggest_categorical(
+                "booster", ["gbtree", "gblinear", "dart"]
+            ),
+            "lambda": trial.suggest_float("lambda", 1e-8, 1.0, log=True),
+            "alpha": trial.suggest_float("alpha", 1e-8, 1.0, log=True),
+        }
+
+        if params["booster"] == "gbtree" or params["booster"] == "dart":
+            params["max_depth"] = trial.suggest_int("max_depth", 1, 9)
+            params["eta"] = trial.suggest_float("eta", 1e-8, 1.0, log=True)
+            params["gamma"] = trial.suggest_float("gamma", 1e-8, 1.0, log=True)
+            params["grow_policy"] = trial.suggest_categorical(
+                "grow_policy", ["depthwise", "lossguide"]
+            )
+
+        # Train XGBoost model
+        bst = xgboost.train(
+            params,
+            kwargs["dtrain"],
+            evals=[
+                (kwargs["dvalid"], "validation"),
+                (kwargs["dtrain"], "train"),
+            ],
+            callbacks=[
+                XGBoostPruningCallback(trial, "validation-rmse"),
+            ],
+            early_stopping_rounds=10,
+            verbose_eval=False,
+        )
+        preds = bst.predict(kwargs["dvalid"])
+        error = mean_squared_error(kwargs["y_valid"], preds)
+
+        # Log to MLflow
+        mlflow.log_params(params)
+        mlflow.log_metric("mse", error)
+        mlflow.log_metric("rmse", math.sqrt(error))
+
+    return error

@@ -2132,8 +2132,10 @@ dependencies = [
     { name = "mlflow" },
     { name = "numpy" },
     { name = "optuna" },
+    { name = "optuna-integration" },
     { name = "pandas" },
     { name = "pip" },
+    { name = "psutil" },
     { name = "scikit-learn" },
     { name = "seaborn" },
     { name = "xgboost" },
@@ -2179,8 +2181,10 @@ requires-dist = [
     { name = "mlflow", extras = ["extras"], marker = "extra == 'mlflow-extras'", specifier = ">=3.1.1" },
     { name = "numpy", specifier = ">=2.1.3" },
     { name = "optuna", specifier = ">=4.4.0" },
+    { name = "optuna-integration", specifier = ">=4.4.0" },
     { name = "pandas", specifier = ">=2.3.1" },
     { name = "pip", specifier = ">=25.1.1" },
+    { name = "psutil", specifier = ">=7.0.0" },
     { name = "scikit-learn", specifier = ">=1.7.1" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "tensorflow", marker = "extra == 'tensorflow'", specifier = ">=2.19.0" },
@@ -2736,6 +2740,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/a5/e0/b303190ae8032d12f320a24c42af04038bacb1f3b17ede354dd1044a5642/optuna-4.4.0.tar.gz", hash = "sha256:a9029f6a92a1d6c8494a94e45abd8057823b535c2570819072dbcdc06f1c1da4", size = 467708, upload-time = "2025-06-16T05:13:00.024Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5c/5e/068798a8c7087863e7772e9363a880ab13fe55a5a7ede8ec42fab8a1acbb/optuna-4.4.0-py3-none-any.whl", hash = "sha256:fad8d9c5d5af993ae1280d6ce140aecc031c514a44c3b639d8c8658a8b7920ea", size = 395949, upload-time = "2025-06-16T05:12:58.37Z" },
+]
+
+[[package]]
+name = "optuna-integration"
+version = "4.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "optuna" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c9/8f/30f37bc7d92ed13cc453a23709608f2dd9f5ae85409b537ad2e24fa4f316/optuna_integration-4.4.0.tar.gz", hash = "sha256:edc1878f9ac8fadc1267708c1c134ae95ce92ded514b11eb34d4911dbb5cf5d3", size = 86293, upload-time = "2025-06-16T05:17:29.657Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ee/6c/b42eec83c066377329f48c250bb80dc00f91c29b200945fcf17953722875/optuna_integration-4.4.0-py3-none-any.whl", hash = "sha256:f698c1e2ad56d4959fc96f50c94ca5c02e5c56b9edd173dedc805a5a50c5069e", size = 98886, upload-time = "2025-06-16T05:17:28.154Z" },
 ]
 
 [[package]]

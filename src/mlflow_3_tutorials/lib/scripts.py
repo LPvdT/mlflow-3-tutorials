@@ -16,12 +16,17 @@ def start_tracking_server() -> None:
     """Start an MLflow tracking server."""
 
     url = f"http://{SERVER_ADDRESS}:{SERVER_PORT}"
+    # run_command(
+    #     "mlflow server "
+    #     f"--host={SERVER_ADDRESS} "
+    #     f"--port={SERVER_PORT} "
+    #     f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+    #     f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+    #     None,
+    # )
     run_command(
-        "mlflow server "
-        f"--host={SERVER_ADDRESS} "
-        f"--port={SERVER_PORT} "
-        f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-        f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
+        f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT}",
+        f"MLflow tracking server: {url}",
         None,
     )
 
@@ -74,7 +79,7 @@ def remove_all_experiments() -> None:
     Logs a message if no experiments are found to delete.
     """
 
-    if sys.argv[1] == "--all" or sys.argv[1] == "-a":
+    if len(sys.argv) > 1 and (sys.argv[1] == "--all" or sys.argv[1] == "-a"):
         run_command(
             "rm -rf mlruns/",
             f"Remove MLflow tracking directory: {DEFAULT_ARTIFACT_ROOT}",

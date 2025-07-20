@@ -2,6 +2,10 @@
 
 version: '3'
 
+env:
+  MLFLOW_DOWNLOAD_CHUNK_TIMEOUT: 5
+  MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT: 5
+
 vars:
   PY:
     sh: |
@@ -20,12 +24,12 @@ tasks:
 
   # Repository management commands
   repo:sync:
-    desc: Install all dependencies (optionally extra packages)
+    desc: Install all dependencies
     aliases: [sync]
-    cmd: '{{.PY}} run_sync {{.EXTRAS | default ""}}'
+    cmd: '{{.PY}} run_sync'
 
   repo:pre-commit:
-    desc: Run pre‑commit hooks
+    desc: Run pre-commit hooks
     aliases: [pc]
     cmd: '{{.PY}} run_precommit'
 
