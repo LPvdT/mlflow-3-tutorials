@@ -60,7 +60,9 @@ with mlflow.start_run(
     experiment_id=experiment_id, run_name=run_name, nested=True
 ):
     # Initialize the Optuna study
-    study = optuna.create_study(direction="minimize")
+    study = optuna.create_study(
+        direction="minimize", pruner=optuna.pruners.HyperbandPruner()
+    )
 
     # Execute the hyperparameter optimization trials.
     # Note the addition of the `champion_callback` inclusion to control our logging
@@ -71,9 +73,11 @@ with mlflow.start_run(
             dvalid=dvalid,  # type: ignore
             y_valid=valid_y,  # type: ignore
         ),
-        n_trials=500,
+        n_trials=1_000,
         callbacks=[champion_callback],
-        n_jobs=-1,
+        n_jobs=1,  # Use 1 job to avoid race conditions with callback
+        show_progress_bar=True,
+        gc_after_trial=True,
     )
 
     mlflow.log_params(study.best_params)
@@ -126,7 +130,6 @@ with mlflow.start_run(
 
 # Load the model from the logged URI
 loaded = mlflow.xgboost.load_model(model_uri)  # type: ignore
-
 
 # Perform inference using the loaded model
 batch_dmatrix = xgboost.DMatrix(X)
