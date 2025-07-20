@@ -1,6 +1,8 @@
 import json
 import math
+from asyncio import eager_task_factory
 from datetime import datetime
+from tabnanny import verbose
 from typing import Any
 
 import matplotlib.pyplot as plt
@@ -405,6 +407,8 @@ def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
                 (kwargs["dtrain"], "train"),
             ],
             callbacks=[XGBoostPruningCallback(trial, "validation-rmse")],
+            early_stopping_rounds=10,
+            verbose_eval=False,
         )
         preds = bst.predict(kwargs["dvalid"])
         error = mean_squared_error(kwargs["y_valid"], preds)
