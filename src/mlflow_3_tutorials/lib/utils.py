@@ -286,3 +286,30 @@ def plot_residuals(
     plt.close(fig)
 
     return fig
+
+
+def plot_feature_importance(
+    model: xgboost.core.Booster, booster: str
+) -> Figure:
+    """
+    Plots feature importance for an XGBoost model.
+
+    Args:
+        model: A trained XGBoost model
+
+    Returns:
+        fig: The matplotlib figure object
+    """
+
+    fig, ax = plt.subplots(figsize=(10, 8))
+    importance_type = "weight" if booster == "gblinear" else "gain"
+    xgboost.plot_importance(
+        model,
+        importance_type=importance_type,
+        ax=ax,
+        title=f"Feature Importance based on {importance_type}",
+    )
+    plt.tight_layout()
+    plt.close(fig)
+
+    return fig
