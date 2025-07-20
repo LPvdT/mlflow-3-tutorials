@@ -35,16 +35,45 @@ def as_json(obj: object, *, indent: int = 2) -> str:
 
 
 def generate_apple_sales_data_with_promo_adjustment(
-    base_demand: int = 1000,
-    n_rows: int = 5000,
+    base_demand: int = 1_000,
+    n_rows: int = 5_000,
+    competitor_price_effect: float = -50.0,
 ) -> pd.DataFrame:
     """
-    Generates a DataFrame containing synthetic apple sales data with promotional adjustments.
+    Generates a synthetic dataset for predicting apple sales demand with multiple influencing factors.
+
+    This function creates a pandas DataFrame with features relevant to apple sales.
+    The features include date, average_temperature, rainfall, weekend flag, holiday flag, promotional flag,
+    price_per_kg, competitor's price, marketing intensity, stock availability, and the previous day's demand.
+    The target variable, 'demand', is generated based on a combination of these features with some added noise.
+
+    Args:
+        base_demand (int, optional): Base demand for apples. Defaults to 1000.
+        n_rows (int, optional): Number of rows (days) of data to generate. Defaults to 5000.
+        competitor_price_effect (float, optional): Effect of competitor's price being lower on our sales.
+                                                    Defaults to -50.
+
+    Returns:
+        pd.DataFrame: DataFrame with features and target variable for apple sales prediction.
+
+    Example:
+    >>> df = generate_apple_sales_data_with_promo_adjustment(base_demand=1200, n_rows=6000)
+    >>> df.head()
     """
 
     rng = np.random.default_rng(9999)
 
-    # Create date range (vectorized)
+    # Constants
+    WEEKENED_DAY_START = 5  # Saturday
+    HARVEST_PRICE_IMPACT = 0.5
+    PRICE_SENSITIVITY = -50
+    HARVEST_EFFECT_MULTIPLIER = 50
+    PROMO_BOOST = 200
+    WEEKEND_BOOST = 300
+    STOCK_THRESHOLD = 0.95
+    MARKETING_DURATION = 7
+
+    # Date range
     dates = pd.date_range(
         end=datetime.now(tz=pytz.timezone("Europe/Amsterdam")),
         periods=n_rows,
@@ -56,13 +85,13 @@ def generate_apple_sales_data_with_promo_adjustment(
         "date": dates,
         "average_temperature": rng.uniform(5, 30, n_rows),
         "rainfall": rng.exponential(5, n_rows),
-        "weekend": pd.Series(dates).dt.weekday >= 5,  # noqa
+        "weekend": pd.Series(dates).dt.weekday >= WEEKENED_DAY_START,
         "holiday": rng.choice([0, 1], n_rows, p=[0.97, 0.03]),
         "price_per_kg": rng.uniform(0.5, 3.0, n_rows),
         "month": pd.Series(dates).dt.month,
     })
 
-    # Vectorized calculations
+    # Inflation and seasonality
     year_min = data_sales["date"].dt.year.min()
     data_sales["inflation_multiplier"] = (
         1 + (data_sales["date"].dt.year - year_min) * 0.03
@@ -72,36 +101,81 @@ def generate_apple_sales_data_with_promo_adjustment(
         2 * np.pi * (data_sales["month"] - 3) / 12
     ) + np.sin(2 * np.pi * (data_sales["month"] - 9) / 12)
 
-    # Adjust price per kg based on harvest effect
-    data_sales["price_per_kg"] -= data_sales["harvest_effect"] * 0.5
+    # Adjust price using harvest effect
+    data_sales["price_per_kg"] -= (
+        data_sales["harvest_effect"] * HARVEST_PRICE_IMPACT
+    )
+    data_sales["price_per_kg"] = data_sales["price_per_kg"].clip(lower=0.1)
 
-    # Promo assignment (vectorized)
+    # Promotions
     peak_months = [4, 10]
-    data_sales["promo"] = 0
     is_peak_month = data_sales["month"].isin(peak_months)
+    data_sales["promo"] = 0
     data_sales.loc[is_peak_month, "promo"] = 1
     data_sales.loc[~is_peak_month, "promo"] = rng.choice(
-        [0, 1], (~is_peak_month).sum(), p=[0.85, 0.15]
+        [0, 1], size=(~is_peak_month).sum(), p=[0.85, 0.15]
     )
 
     # Calculate demand components
-    base_price_effect = -data_sales["price_per_kg"] * 50
-    seasonality_effect = data_sales["harvest_effect"] * 50
-    promo_effect = data_sales["promo"] * 200
+    price_penalty = data_sales["price_per_kg"] * PRICE_SENSITIVITY
+    seasonality = data_sales["harvest_effect"] * HARVEST_EFFECT_MULTIPLIER
+    promo_bonus = data_sales["promo"] * PROMO_BOOST
+    weekend_bonus = data_sales["weekend"].astype(int) * WEEKEND_BOOST
 
     data_sales["demand"] = (
         base_demand
-        + base_price_effect
-        + seasonality_effect
-        + promo_effect
-        + data_sales["weekend"].astype(int) * 300
+        + price_penalty
+        + seasonality
+        + promo_bonus
+        + weekend_bonus
         + rng.normal(0, 50, n_rows)
     ) * data_sales["inflation_multiplier"]
 
-    # Previous day's demand with fill backward for first row
-    data_sales["previous_days_demand"] = data_sales["demand"].shift(1).bfill()
+    # Previous day's demand (fill with next day's value for first entry)
+    data_sales["previous_days_demand"] = data_sales["demand"].shift(1)
+    data_sales["previous_days_demand"] = data_sales[
+        "previous_days_demand"
+    ].fillna(method="bfill")
 
-    # Drop temporary columns
+    # Competitor pricing
+    data_sales["competitor_price_per_kg"] = rng.uniform(0.5, 3.0, n_rows)
+    data_sales["competitor_price_effect"] = (
+        data_sales["competitor_price_per_kg"] < data_sales["price_per_kg"]
+    ) * competitor_price_effect
+
+    # Stock availability (lagged)
+    price_lag_3 = data_sales["price_per_kg"].shift(3).fillna(method="bfill")
+    stock_available = -np.log(price_lag_3 + 1) + 2
+    data_sales["stock_available"] = np.clip(stock_available, 0.7, 1)
+
+    # Marketing intensity
+    data_sales["marketing_intensity"] = np.nan
+
+    high_stock_indices = data_sales[
+        data_sales["stock_available"] > STOCK_THRESHOLD
+    ].index
+
+    for idx in high_stock_indices:
+        end_idx = min(idx + MARKETING_DURATION - 1, n_rows - 1)
+        data_sales.loc[idx:end_idx, "marketing_intensity"] = rng.uniform(0.7, 1)
+
+    data_sales["marketing_intensity"] = data_sales[
+        "marketing_intensity"
+    ].fillna(pd.Series(rng.uniform(0, 0.5, n_rows), index=data_sales.index))
+
+    # Final demand adjustment
+    data_sales["demand"] += (
+        data_sales["competitor_price_effect"]
+        + data_sales["marketing_intensity"]
+    )
+
+    # Cleanup
     return data_sales.drop(
-        columns=["inflation_multiplier", "harvest_effect", "month"]
+        columns=[
+            "inflation_multiplier",
+            "harvest_effect",
+            "month",
+            "competitor_price_effect",
+            "stock_available",
+        ]
     )
