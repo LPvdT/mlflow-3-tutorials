@@ -5,6 +5,7 @@ from typing import Any
 import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
+import optuna
 import pandas as pd
 import pytz
 import seaborn as sns
@@ -334,3 +335,38 @@ def get_or_create_experiment(experiment_name: str) -> str:
     if experiment := mlflow.get_experiment_by_name(experiment_name):
         return experiment.experiment_id
     return mlflow.create_experiment(experiment_name)
+
+
+def champion_callback(
+    study: optuna.Study, frozen_trial: optuna.trial.FrozenTrial
+) -> None:
+    """
+    Logging callback that will report when a new trial iteration improves upon existing
+    best trial values.
+
+    Note
+    ---
+
+    This callback is not intended for use in distributed computing systems such as Spark
+    or Ray due to the micro-batch iterative implementation for distributing trials to a cluster's
+    workers or agents.
+
+    The race conditions with file system state management for distributed trials will render
+    inconsistent values with this callback.
+    """
+
+    winner = study.user_attrs.get("winner", None)
+
+    if study.best_value and winner != study.best_value:
+        study.set_user_attr("winner", study.best_value)
+        if winner:
+            improvement_percentage = (
+                abs(winner - study.best_value) / study.best_value
+            ) * 100
+            logger.success(
+                f"Trial {frozen_trial.number} achieved value: {frozen_trial.value} with "
+                f"{improvement_percentage: .4f}% improvement"
+            )
+        logger.debug(
+            f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value}"
+        )
