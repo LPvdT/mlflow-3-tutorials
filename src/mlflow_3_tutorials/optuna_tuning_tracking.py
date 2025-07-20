@@ -8,6 +8,7 @@ import psutil
 import xgboost
 from loguru import logger
 from mlflow import exceptions
+from optuna.integration.mlflow import MLflowCallback
 from sklearn.model_selection import train_test_split
 
 from mlflow_3_tutorials.lib.constants import TRACKING_URI
@@ -24,7 +25,7 @@ from mlflow_3_tutorials.lib.utils import (
 
 def main() -> None:
     # Set Optuna logging level
-    optuna.logging.set_verbosity(optuna.logging.WARNING)
+    optuna.logging.set_verbosity(optuna.logging.ERROR)
 
     # Set the MLflow tracking URI
     mlflow.set_tracking_uri(TRACKING_URI)
@@ -77,7 +78,15 @@ def main() -> None:
                 y_valid=valid_y,  # type: ignore
             ),
             n_trials=1_000,
-            callbacks=[champion_callback],
+            callbacks=[
+                champion_callback,
+                MLflowCallback(
+                    create_experiment=False,
+                    tracking_uri=TRACKING_URI,
+                    metric_name="rmse",
+                    mlflow_kwargs={"nested": True},
+                ),
+            ],
             n_jobs=psutil.cpu_count(logical=True) - 1,  # type: ignore
             show_progress_bar=True,
             gc_after_trial=True,
@@ -133,6 +142,7 @@ def main() -> None:
 
     # Load the model from the logged URI
     try:
+        logger.info("Trying to load model from local directory...")
         loaded = mlflow.xgboost.load_model(  # type: ignore
             str(
                 next(
@@ -143,13 +153,13 @@ def main() -> None:
             )
         )
     except FileNotFoundError:
-        loaded = mlflow.xgboost.load_model(model_uri)  # type: ignore
         logger.warning(
-            "No artifacts found in local directory. Downloading model from MLflow."
+            "No artifacts found in local directory. Downloading model from MLflow..."
         )
+        loaded = mlflow.xgboost.load_model(model_uri)  # type: ignore
     except exceptions.MlflowException:
         logger.warning(
-            "Timed out even though model was downloaded successfully."
+            "Timed out even though model was downloaded successfully. Loading from local directory..."
         )
         loaded = mlflow.xgboost.load_model(  # type: ignore
             str(
