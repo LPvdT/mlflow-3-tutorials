@@ -2,6 +2,10 @@
 
 version: '3'
 
+env:
+  MLFLOW_DOWNLOAD_CHUNK_TIMEOUT: 5
+  MLFLOW_ARTIFACT_UPLOAD_DOWNLOAD_TIMEOUT: 5
+
 vars:
   PY:
     sh: |
