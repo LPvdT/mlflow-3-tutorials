@@ -7,6 +7,7 @@ import numpy as np
 import pandas as pd
 import pytz
 import seaborn as sns
+import xgboost
 from loguru import logger
 from matplotlib.figure import Figure
 
@@ -221,6 +222,60 @@ def plot_correlation_with_demand(
     plt.xticks(fontsize=14)
     plt.yticks(fontsize=14)
     plt.grid(axis="x")
+
+    plt.tight_layout()
+
+    # Save the plot if save_path is specified
+    if save_path:
+        plt.savefig(save_path, format="png", dpi=600)
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_residuals(
+    model: xgboost.core.Booster,
+    dvalid: xgboost.core.DMatrix,
+    valid_y: pd.Series,
+    save_path: str | None = None,
+) -> Figure:
+    """
+    Plots the residuals of the model predictions against the true values.
+
+    Args:
+    - model: The trained XGBoost model.
+    - dvalid (xgb.DMatrix): The validation data in XGBoost DMatrix format.
+    - valid_y (pd.Series): The true values for the validation set.
+    - save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
+
+    Returns:
+    - None (Displays the residuals plot on a Jupyter window)
+    """
+
+    # Predict using the model
+    preds = model.predict(dvalid)
+
+    # Calculate residuals
+    residuals = valid_y - preds
+
+    # Set Seaborn style
+    sns.set_style(
+        "whitegrid", {"axes.facecolor": "#c2c4c2", "grid.linewidth": 1.5}
+    )
+
+    # Create scatter plot
+    fig = plt.figure(figsize=(12, 8))
+    plt.scatter(valid_y, residuals, color="blue", alpha=0.5)
+    plt.axhline(y=0, color="r", linestyle="-")
+
+    # Set labels, title and other plot properties
+    plt.title("Residuals vs True Values", fontsize=18)
+    plt.xlabel("True Values", fontsize=16)
+    plt.ylabel("Residuals", fontsize=16)
+    plt.xticks(fontsize=14)
+    plt.yticks(fontsize=14)
+    plt.grid(axis="y")
 
     plt.tight_layout()
 
