@@ -192,11 +192,11 @@ def plot_correlation_with_demand(
     Plots the correlation of each variable in the dataframe with the 'demand' column.
 
     Args:
-    - df (pd.DataFrame): DataFrame containing the data, including a 'demand' column.
-    - save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
+        df (pd.DataFrame): DataFrame containing the data, including a 'demand' column.
+        save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
 
     Returns:
-    - None (Displays the plot on a Jupyter window)
+        None (Displays the plot on a Jupyter window)
     """
 
     # Compute correlations between all variables and 'demand'
@@ -244,13 +244,13 @@ def plot_residuals(
     Plots the residuals of the model predictions against the true values.
 
     Args:
-    - model: The trained XGBoost model.
-    - dvalid (xgb.DMatrix): The validation data in XGBoost DMatrix format.
-    - valid_y (pd.Series): The true values for the validation set.
-    - save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
+        model: The trained XGBoost model.
+        dvalid (xgb.DMatrix): The validation data in XGBoost DMatrix format.
+        valid_y (pd.Series): The true values for the validation set.
+        save_path (str, optional): Path to save the generated plot. If not specified, plot won't be saved.
 
     Returns:
-    - None (Displays the residuals plot on a Jupyter window)
+        None (Displays the residuals plot on a Jupyter window)
     """
 
     # Predict using the model
