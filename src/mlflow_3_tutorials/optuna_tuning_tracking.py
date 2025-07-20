@@ -1,8 +1,10 @@
 import functools
 import math
+from pathlib import Path
 
 import mlflow
 import optuna
+import psutil
 import xgboost
 from loguru import logger
 from sklearn.model_selection import train_test_split
@@ -19,9 +21,8 @@ from mlflow_3_tutorials.lib.utils import (
 )
 
 # Set Optuna logging level
-optuna.logging.set_verbosity(optuna.logging.INFO)
-# optuna.logging.set_verbosity(optuna.logging.WARNING)
-# optuna.logging.set_verbosity(optuna.logging.ERROR)
+# optuna.logging.set_verbosity(optuna.logging.INFO)
+optuna.logging.set_verbosity(optuna.logging.WARNING)
 
 # Set the MLflow tracking URI
 mlflow.set_tracking_uri(TRACKING_URI)
@@ -75,7 +76,7 @@ with mlflow.start_run(
         ),
         n_trials=1_000,
         callbacks=[champion_callback],
-        n_jobs=1,  # Use 1 job to avoid race conditions with callback
+        n_jobs=psutil.cpu_count(logical=True) - 2,  # type: ignore
         show_progress_bar=True,
         gc_after_trial=True,
     )
@@ -129,7 +130,8 @@ with mlflow.start_run(
     logger.info(f"Model logged to MLflow at: {model_uri}")
 
 # Load the model from the logged URI
-loaded = mlflow.xgboost.load_model(model_uri)  # type: ignore
+model_path = Path("loaded_model").mkdir(exist_ok=True)
+loaded = mlflow.xgboost.load_model(model_uri, model_path.as_posix())  # type: ignore
 
 # Perform inference using the loaded model
 batch_dmatrix = xgboost.DMatrix(X)
