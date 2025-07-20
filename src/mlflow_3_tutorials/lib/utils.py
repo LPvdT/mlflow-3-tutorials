@@ -382,6 +382,7 @@ def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
         params = {
             "objective": "reg:squarederror",
             "eval_metric": "rmse",
+            "device": "gpu:0",  # Specify GPU device
             "booster": trial.suggest_categorical(
                 "booster", ["gbtree", "gblinear", "dart"]
             ),
