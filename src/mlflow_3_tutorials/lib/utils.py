@@ -404,7 +404,9 @@ def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
                 (kwargs["dvalid"], "validation"),
                 (kwargs["dtrain"], "train"),
             ],
-            callbacks=[XGBoostPruningCallback(trial, "validation-rmse")],
+            callbacks=[
+                XGBoostPruningCallback(trial, "validation-rmse"),
+            ],
             early_stopping_rounds=10,
             verbose_eval=False,
         )
