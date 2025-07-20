@@ -1,4 +1,5 @@
 import json
+import math
 from datetime import datetime
 from typing import Any
 
@@ -12,6 +13,7 @@ import seaborn as sns
 import xgboost
 from loguru import logger
 from matplotlib.figure import Figure
+from sklearn.metrics import mean_squared_error
 
 
 def as_json(obj: object, *, indent: int = 2) -> str:
@@ -370,3 +372,39 @@ def champion_callback(
         logger.debug(
             f"Initial trial {frozen_trial.number} achieved value: {frozen_trial.value}"
         )
+
+
+def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
+    error = 0.0
+
+    with mlflow.start_run(nested=True):
+        # Define hyperparameters
+        params = {
+            "objective": "reg:squarederror",
+            "eval_metric": "rmse",
+            "booster": trial.suggest_categorical(
+                "booster", ["gbtree", "gblinear", "dart"]
+            ),
+            "lambda": trial.suggest_float("lambda", 1e-8, 1.0, log=True),
+            "alpha": trial.suggest_float("alpha", 1e-8, 1.0, log=True),
+        }
+
+        if params["booster"] == "gbtree" or params["booster"] == "dart":
+            params["max_depth"] = trial.suggest_int("max_depth", 1, 9)
+            params["eta"] = trial.suggest_float("eta", 1e-8, 1.0, log=True)
+            params["gamma"] = trial.suggest_float("gamma", 1e-8, 1.0, log=True)
+            params["grow_policy"] = trial.suggest_categorical(
+                "grow_policy", ["depthwise", "lossguide"]
+            )
+
+        # Train XGBoost model
+        bst = xgboost.train(params, kwargs["dtrain"])
+        preds = bst.predict(kwargs["dvalid"])
+        error = mean_squared_error(kwargs["y_valid"], preds)
+
+        # Log to MLflow
+        mlflow.log_params(params)
+        mlflow.log_metric("mse", error)
+        mlflow.log_metric("rmse", math.sqrt(error))
+
+    return error
