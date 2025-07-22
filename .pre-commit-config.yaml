@@ -40,4 +40,4 @@ repos:
     hooks:
       - id: yamlfix
         name: YAML Fix
-        args: [--config-file=yamlfix.toml]
+        args: [--config-file=pyproject.toml]
