@@ -7,20 +7,6 @@ authors = [
     { name = "Laurens van der Tas", email = "laurens.vandertas@gmail.com" },
 ]
 requires-python = ">=3.12"
-dependencies = [
-    "hyperopt>=0.2.7",
-    "loguru>=0.7.3",
-    "mlflow>=3.1.1",
-    "numpy>=2.1.3",
-    "optuna>=4.4.0",
-    "optuna-integration>=4.4.0",
-    "pandas>=2.3.1",
-    "pip>=25.1.1",
-    "psutil>=7.0.0",
-    "scikit-learn>=1.7.1",
-    "seaborn>=0.13.2",
-    "xgboost>=3.0.2",
-]
 
 [project.scripts]
 # Repository commands
@@ -38,14 +24,31 @@ deep_learning = "mlflow_3_tutorials.deep_learning_quickstart:main"
 model_registry = "mlflow_3_tutorials.model_registry_quickstart:main"
 optuna_tuning_tracking = "mlflow_3_tutorials.optuna_tuning_tracking:main"
 
+dependencies = [
+    "hyperopt>=0.2.7",
+    "loguru>=0.7.3",
+    "mlflow>=3.1.1",
+    "numpy>=2.1.3",
+    "optuna>=4.4.0",
+    "optuna-integration>=4.4.0",
+    "pandas>=2.3.1",
+    "pip>=25.1.1",
+    "psutil>=7.0.0",
+    "scikit-learn>=1.7.1",
+    "seaborn>=0.13.2",
+    "xgboost>=3.0.2",
+]
+
 [project.optional-dependencies]
 tensorflow = [
     "keras>=3.10.0",
     "tensorflow>=2.19.0",
 ]
+
 mlflow_extras = [
     "mlflow[extras]>=3.1.1",
 ]
+
 pytorch = [
     "torch>=2.7.1",
     "torchvision>=0.22.1",
@@ -61,7 +64,9 @@ dev = [
     "pre-commit>=4.2.0",
     "pyment>=0.3.3",
     "ruff>=0.12.4",
+    "yamlfix>=1.17.0",
 ]
+
 test = [
     "pytest>=8.4.1",
     "pytest-cov>=6.2.1",
