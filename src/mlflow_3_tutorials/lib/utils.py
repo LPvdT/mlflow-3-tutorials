@@ -66,7 +66,9 @@ def generate_apple_sales_data_with_promo_adjustment(
         pd.DataFrame: DataFrame with features and target variable for apple sales prediction.
 
     Example:
-    >>> df = generate_apple_sales_data_with_promo_adjustment(base_demand=1200, n_rows=6000)
+    >>> df = generate_apple_sales_data_with_promo_adjustment(
+    ...     base_demand=1200, n_rows=6000
+    ... )
     >>> df.head()
     """
 
