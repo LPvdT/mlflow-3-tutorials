@@ -22,18 +22,11 @@ repos:
     hooks:
       - id: ruff-check
         name: Ruff Check
-        types_or: [python, pyi]
-        args:
-          - --fix
-          - --config=pyproject.toml
-          - --exit-zero
-          - --unsafe-fixes
-          - .
+        args: [--fix, --config=pyproject.toml, --exit-zero, --unsafe-fixes]
 
       - id: ruff-format
         name: Ruff Format
-        types_or: [python, pyi]
-        args: [--config=pyproject.toml, .]
+        args: [--config=pyproject.toml]
 
   - repo: https://github.com/lyz-code/yamlfix
     rev: 1.17.0
