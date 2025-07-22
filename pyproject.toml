@@ -84,6 +84,9 @@ line-length = 80
 unsafe-fixes = true
 preview = true
 
+[tool.ruff.lint]
+preview = true
+
 select = [
     "ALL",
 ]
@@ -172,3 +175,14 @@ line-ending = "lf"
 docstring-code-format = true
 docstring-code-line-length = 80
 preview = true
+
+[tool.yamlfix]
+indentation = 2
+quote_type = "single"
+explicit_start = false
+explicit_end = true
+trim_trailing_spaces = true
+comments_min_spaces_from_content = 1
+whitelines = 1
+comments_whitelines = 1
+section_whitelines = 1
