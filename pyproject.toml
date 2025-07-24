@@ -8,6 +8,21 @@ authors = [
 ]
 requires-python = ">=3.12"
 
+dependencies = [
+    "hyperopt>=0.2.7",
+    "loguru>=0.7.3",
+    "mlflow>=3.1.1",
+    "numpy>=2.1.3",
+    "optuna>=4.4.0",
+    "optuna-integration>=4.4.0",
+    "pandas>=2.3.1",
+    "pip>=25.1.1",
+    "psutil>=7.0.0",
+    "scikit-learn>=1.7.1",
+    "seaborn>=0.13.2",
+    "xgboost>=3.0.2",
+]
+
 [project.scripts]
 # Repository commands
 run_sync = "mlflow_3_tutorials.lib.scripts:uv_sync"
@@ -23,21 +38,6 @@ serve_wine_model = "mlflow_3_tutorials.lib.scripts:serve_wine_model"
 deep_learning = "mlflow_3_tutorials.deep_learning_quickstart:main"
 model_registry = "mlflow_3_tutorials.model_registry_quickstart:main"
 optuna_tuning_tracking = "mlflow_3_tutorials.optuna_tuning_tracking:main"
-
-dependencies = [
-    "hyperopt>=0.2.7",
-    "loguru>=0.7.3",
-    "mlflow>=3.1.1",
-    "numpy>=2.1.3",
-    "optuna>=4.4.0",
-    "optuna-integration>=4.4.0",
-    "pandas>=2.3.1",
-    "pip>=25.1.1",
-    "psutil>=7.0.0",
-    "scikit-learn>=1.7.1",
-    "seaborn>=0.13.2",
-    "xgboost>=3.0.2",
-]
 
 [project.optional-dependencies]
 tensorflow = [
