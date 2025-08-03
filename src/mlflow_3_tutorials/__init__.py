@@ -1,31 +1,10 @@
 import logging
 import sys
-from logging import Handler, LogRecord
 
 from loguru import logger
 
 from mlflow_3_tutorials.lib.constants import LOG_LEVEL
-
-
-# ruff: noqa: PLR6301
-class InterceptHandler(Handler):
-    def emit(self, record: LogRecord) -> None:
-        try:
-            level: str | int = logger.level(record.levelname).name
-        except ValueError:
-            level = record.levelno
-
-        frame = logging.currentframe()
-        depth = 2
-        while frame and frame.f_code.co_filename == logging.__file__:
-            frame = frame.f_back
-            depth += 1
-
-        logger.opt(depth=depth, exception=record.exc_info).log(
-            level,
-            record.getMessage(),
-        )
-
+from mlflow_3_tutorials.lib.utils import InterceptHandler
 
 # Setup Loguru to replace standard logging
 logger.remove()
