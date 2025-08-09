@@ -4,7 +4,7 @@ import math
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 import matplotlib.pyplot as plt
 import mlflow
@@ -24,9 +24,6 @@ from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 
 # Configure logger
 logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
-# Set the default style for seaborn plots
-sns.set_style("whitegrid")
 
 
 # ruff: noqa: PLR6301
@@ -533,7 +530,9 @@ def plot_box_weekend(
 
     fig, ax = plt.subplots(figsize=plot_size)
 
-    sns.boxplot(x="weekend", y="demand", data=df, ax=ax, palette="Set2")
+    sns.boxplot(
+        x="weekend", y="demand", data=df, ax=ax, palette="Set2", hue="weekend"
+    )
 
     sns.stripplot(
         data=df,
@@ -692,7 +691,6 @@ def plot_coefficients(
     model: Any,
     /,
     feature_names: list[str],
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -701,24 +699,22 @@ def plot_coefficients(
     Args:
         - model (Any): A model object with a coef_ attribute.
         - feature_names (list[str]): A list of feature names corresponding to the coefficients in `model.coef_`.
-        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
         - Figure: A Matplotlib Figure object containing the bar plot.
     """
 
-    with plt.style.context(style=style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        ax.barh(feature_names, model.coef_)
+    ax.barh(feature_names, model.coef_)
 
-        # Set labels and title
-        ax.set_title("Coefficient Plot", fontsize=14)
-        ax.set_xlabel("Coefficient Value", fontsize=12)
-        ax.set_ylabel("Features", fontsize=12)
+    # Set labels and title
+    ax.set_title("Coefficient Plot", fontsize=14)
+    ax.set_xlabel("Coefficient Value", fontsize=12)
+    ax.set_ylabel("Features", fontsize=12)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -728,7 +724,6 @@ def plot_coefficients(
 def plot_residuals(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -737,7 +732,6 @@ def plot_residuals(
     Args:
         - y_test (pd.Series | np.ndarray): The true values of the test set.
         - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
-        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -746,28 +740,27 @@ def plot_residuals(
 
     residuals = y_test - y_pred
 
-    with plt.style.context(style=style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        sns.residplot(
-            x=y_pred,
-            y=residuals,
-            lowess=True,
-            ax=ax,
-            line_kws={"color": "red", "lw": 1},
-        )
+    sns.residplot(
+        x=y_pred,
+        y=residuals,
+        lowess=True,
+        ax=ax,
+        line_kws={"color": "red", "lw": 1},
+    )
 
-        ax.axhline(y=0, color="black", linestyle="--")
+    ax.axhline(y=0, color="black", linestyle="--")
 
-        # Set labels and title
-        ax.set_title("Residual Plot", fontsize=14)
-        ax.set_xlabel("Predicted values", fontsize=12)
-        ax.set_ylabel("Residuals", fontsize=12)
+    # Set labels and title
+    ax.set_title("Residual Plot", fontsize=14)
+    ax.set_xlabel("Predicted values", fontsize=12)
+    ax.set_ylabel("Residuals", fontsize=12)
 
-        for label in ax.get_xticklabels() + ax.get_yticklabels():
-            label.set_fontsize(10)
+    for label in ax.get_xticklabels() + ax.get_yticklabels():
+        label.set_fontsize(10)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -778,7 +771,6 @@ def plot_prediction_error(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
     /,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -794,18 +786,17 @@ def plot_prediction_error(
         - Figure: A Matplotlib Figure object containing the prediction error plot.
     """
 
-    with plt.style.context(style=style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        ax.scatter(y_pred, y_test - y_pred)
-        ax.axhline(y=0, color="red", linestyle="--")
+    ax.scatter(y_pred, y_test - y_pred)
+    ax.axhline(y=0, color="red", linestyle="--")
 
-        # Set labels and title
-        ax.set_title("Prediction Error Plot", fontsize=14)
-        ax.set_xlabel("Predicted Values", fontsize=12)
-        ax.set_ylabel("Errors", fontsize=12)
+    # Set labels and title
+    ax.set_title("Prediction Error Plot", fontsize=14)
+    ax.set_xlabel("Predicted Values", fontsize=12)
+    ax.set_ylabel("Errors", fontsize=12)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -815,7 +806,6 @@ def plot_prediction_error(
 def plot_qq(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -824,7 +814,6 @@ def plot_qq(
     Args:
         - y_test (pd.Series | np.ndarray): The true values of the test set.
         - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
-        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -833,15 +822,14 @@ def plot_qq(
 
     residuals = y_test - y_pred
 
-    with plt.style.context(style=style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        stats.probplot(residuals, dist="norm", plot=ax)
+    stats.probplot(residuals, dist="norm", plot=ax)
 
-        # Set title
-        ax.set_title("QQ Plot", fontsize=14)
+    # Set title
+    ax.set_title("QQ Plot", fontsize=14)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -851,7 +839,6 @@ def plot_qq(
 def plot_correlation_matrix(
     data: pd.DataFrame,
     /,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
     save_path: str | None = "figures/corr_plot.png",
 ) -> Figure:
@@ -860,39 +847,37 @@ def plot_correlation_matrix(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the data to compute correlations.
-        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
         - Figure: A Matplotlib Figure object containing the heatmap.
     """
 
-    with plt.style.context(style=style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        # Calculate the correlation matrix
-        corr = data.corr()
+    # Calculate the correlation matrix
+    corr = data.corr()
 
-        # Generate a mask for the upper triangle
-        mask = np.triu(np.ones_like(corr, dtype=bool))
+    # Generate a mask for the upper triangle
+    mask = np.triu(np.ones_like(corr, dtype=bool))
 
-        # Draw the heatmap with the mask and correct aspect ratio
-        sns.heatmap(
-            corr,
-            mask=mask,
-            cmap="coolwarm",
-            vmax=0.3,
-            center=0,
-            square=True,
-            linewidths=0.5,
-            annot=True,
-            fmt=".2f",
-        )
+    # Draw the heatmap with the mask and correct aspect ratio
+    sns.heatmap(
+        corr,
+        mask=mask,
+        cmap="coolwarm",
+        vmax=0.3,
+        center=0,
+        square=True,
+        linewidths=0.5,
+        annot=True,
+        fmt=".2f",
+    )
 
-        # Set title
-        ax.set_title("Feature Correlation Matrix", fontsize=14)
+    # Set title
+    ax.set_title("Feature Correlation Matrix", fontsize=14)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
