@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import mlflow
+import mlflow_go_backend
 import optuna
 import psutil
 import xgboost
@@ -23,11 +24,13 @@ from mlflow_3_tutorials.lib.utils import (
     plot_residuals_xgboost,
 )
 
-# Configure logger
-logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
 
 def main() -> None:
+    mlflow_go_backend.enable_go()
+
+    # Configure logger
+    logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
     # Set Optuna logging level
     optuna.logging.set_verbosity(optuna.logging.ERROR)
 
@@ -41,7 +44,7 @@ def main() -> None:
 
     # Generate correlation plot with demand
     correlation_plot = plot_correlation_with_demand(
-        data_apples, save_path="correlation_plot.png"
+        data_apples, save_path="figures/correlation_plot.png"
     )
 
     # Get or create an MLflow experiment
