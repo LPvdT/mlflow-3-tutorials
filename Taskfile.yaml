@@ -99,4 +99,4 @@ tasks:
   proj:logging-visualizations:
     desc: Logging and visualization of metrics
     aliases: [lv]
-    cmd: '{{.PY}} logging_visualization'
+    cmd: '{{.PY}} logging_visualizations'
