@@ -1,6 +1,7 @@
 import json
 import logging
 import math
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -18,6 +19,10 @@ from matplotlib.figure import Figure
 from optuna.integration import XGBoostPruningCallback
 from scipy import stats
 from sklearn.metrics import mean_squared_error
+
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 # ruff: noqa: PLR6301
