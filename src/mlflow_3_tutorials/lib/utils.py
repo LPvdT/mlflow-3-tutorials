@@ -458,7 +458,6 @@ def plot_time_series_demand(
     data: pd.DataFrame,
     /,
     window_size: int = 7,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (16, 12),
 ) -> Figure:
     """
@@ -466,7 +465,6 @@ def plot_time_series_demand(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the time series data with a 'date' and 'demand' column.
-        - window_size (int, optional): The window size for calculating the rolling average. Default is 7.
         - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (16, 12).
 
@@ -481,34 +479,33 @@ def plot_time_series_demand(
     # Calculate the rolling average
     df["rolling_avg"] = df["demand"].rolling(window=window_size).mean()
 
-    with plt.style.context(style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        # Plot the original time series data with low alpha (transparency)
-        ax.plot(
-            df["date"], df["demand"], "b-o", label="Original Demand", alpha=0.15
-        )
+    # Plot the original time series data with low alpha (transparency)
+    ax.plot(
+        df["date"], df["demand"], "b-o", label="Original Demand", alpha=0.15
+    )
 
-        # Plot the rolling average
-        ax.plot(
-            df["date"],
-            df["rolling_avg"],
-            label=f"{window_size}-Day Rolling Average",
-            color="orange",
-            linewidth=2,
-        )
+    # Plot the rolling average
+    ax.plot(
+        df["date"],
+        df["rolling_avg"],
+        label=f"{window_size}-Day Rolling Average",
+        color="orange",
+        linewidth=2,
+    )
 
-        # Set labels and title
-        ax.set_title(
-            f"Time Series Plot of Demand with {window_size} day Rolling Average",
-            fontsize=14,
-        )
-        ax.set_xlabel("Date", fontsize=12)
-        ax.set_ylabel("Demand", fontsize=12)
+    # Set labels and title
+    ax.set_title(
+        f"Time Series Plot of Demand with {window_size} day Rolling Average",
+        fontsize=14,
+    )
+    ax.set_xlabel("Date", fontsize=12)
+    ax.set_ylabel("Demand", fontsize=12)
 
-        # Add legend to explain the lines
-        ax.legend()
-        plt.tight_layout()
+    # Add legend to explain the lines
+    ax.legend()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -518,7 +515,6 @@ def plot_time_series_demand(
 def plot_box_weekend(
     data: pd.DataFrame,
     /,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -535,35 +531,32 @@ def plot_box_weekend(
 
     df = data.copy()
 
-    with plt.style.context(style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        sns.boxplot(
-            x="weekend", y="demand", data=df, ax=ax, palette="lightgray"
-        )
+    sns.boxplot(x="weekend", y="demand", data=df, ax=ax, palette="lightgray")
 
-        sns.stripplot(
-            data=df,
-            x="weekend",
-            y="demand",
-            ax=ax,
-            hue="weekend",
-            palette={0: "blue", 1: "green"},
-            alpha=0.15,
-            jitter=0.3,
-            size=5,
-        )
+    sns.stripplot(
+        data=df,
+        x="weekend",
+        y="demand",
+        ax=ax,
+        hue="weekend",
+        palette={0: "blue", 1: "green"},
+        alpha=0.15,
+        jitter=0.3,
+        size=5,
+    )
 
-        # Set labels and title
-        ax.set_title("Box Plot of Demand on Weekends vs. Weekdays", fontsize=14)
-        ax.set_xlabel("Weekend (0: No, 1: Yes)", fontsize=12)
-        ax.set_ylabel("Demand", fontsize=12)
+    # Set labels and title
+    ax.set_title("Box Plot of Demand on Weekends vs. Weekdays", fontsize=14)
+    ax.set_xlabel("Weekend (0: No, 1: Yes)", fontsize=12)
+    ax.set_ylabel("Demand", fontsize=12)
 
-        for i in ax.get_xticklabels() + ax.get_yticklabels():
-            i.set_fontsize(10)
+    for i in ax.get_xticklabels() + ax.get_yticklabels():
+        i.set_fontsize(10)
 
-        ax.legend_.remove()  # type: ignore
-        plt.tight_layout()
+    ax.legend_.remove()  # type: ignore
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -573,7 +566,6 @@ def plot_box_weekend(
 def plot_scatter_demand_price(
     data: pd.DataFrame,
     /,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -590,51 +582,50 @@ def plot_scatter_demand_price(
 
     df = data.copy()
 
-    with plt.style.context(style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        # Scatter plot with jitter, transparency, and color-coded based on weekend
-        sns.scatterplot(
-            data=df,
-            x="price_per_kg",
-            y="demand",
-            hue="weekend",
-            palette={0: "blue", 1: "green"},
-            alpha=0.15,
-            ax=ax,
-        )
+    # Scatter plot with jitter, transparency, and color-coded based on weekend
+    sns.scatterplot(
+        data=df,
+        x="price_per_kg",
+        y="demand",
+        hue="weekend",
+        palette={0: "blue", 1: "green"},
+        alpha=0.15,
+        ax=ax,
+    )
 
-        # Fit a simple regression line for each subgroup
-        sns.regplot(
-            data=df[df["weekend"] == 0],  # type: ignore
-            x="price_per_kg",
-            y="demand",
-            scatter=False,
-            color="blue",
-            ax=ax,
-        )
+    # Fit a simple regression line for each subgroup
+    sns.regplot(
+        data=df[df["weekend"] == 0],  # type: ignore
+        x="price_per_kg",
+        y="demand",
+        scatter=False,
+        color="blue",
+        ax=ax,
+    )
 
-        sns.regplot(
-            data=df[df["weekend"] == 1],  # type: ignore
-            x="price_per_kg",
-            y="demand",
-            scatter=False,
-            color="green",
-            ax=ax,
-        )
+    sns.regplot(
+        data=df[df["weekend"] == 1],  # type: ignore
+        x="price_per_kg",
+        y="demand",
+        scatter=False,
+        color="green",
+        ax=ax,
+    )
 
-        # Set labels and title
-        ax.set_title(
-            "Scatter Plot of Demand vs Price per kg with Regression Line",
-            fontsize=14,
-        )
-        ax.set_xlabel("Price per kg", fontsize=12)
-        ax.set_ylabel("Demand", fontsize=12)
+    # Set labels and title
+    ax.set_title(
+        "Scatter Plot of Demand vs Price per kg with Regression Line",
+        fontsize=14,
+    )
+    ax.set_xlabel("Price per kg", fontsize=12)
+    ax.set_ylabel("Demand", fontsize=12)
 
-        for i in ax.get_xticklabels() + ax.get_yticklabels():
-            i.set_fontsize(10)
+    for i in ax.get_xticklabels() + ax.get_yticklabels():
+        i.set_fontsize(10)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
@@ -644,7 +635,6 @@ def plot_scatter_demand_price(
 def plot_density_weekday_weekend(
     data: pd.DataFrame,
     /,
-    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -661,38 +651,37 @@ def plot_density_weekday_weekend(
 
     df = data.copy()
 
-    with plt.style.context(style):
-        fig, ax = plt.subplots(figsize=plot_size)
+    fig, ax = plt.subplots(figsize=plot_size)
 
-        # Plot density for weekdays
-        sns.kdeplot(
-            df[df["weekend"] == 0]["demand"],  # type: ignore
-            color="blue",
-            label="Weekday",
-            ax=ax,
-            fill=True,
-            alpha=0.15,
-        )
+    # Plot density for weekdays
+    sns.kdeplot(
+        df[df["weekend"] == 0]["demand"],  # type: ignore
+        color="blue",
+        label="Weekday",
+        ax=ax,
+        fill=True,
+        alpha=0.15,
+    )
 
-        # Plot density for weekends
-        sns.kdeplot(
-            df[df["weekend"] == 1]["demand"],  # type: ignore
-            color="green",
-            label="Weekend",
-            ax=ax,
-            fill=True,
-            alpha=0.15,
-        )
+    # Plot density for weekends
+    sns.kdeplot(
+        df[df["weekend"] == 1]["demand"],  # type: ignore
+        color="green",
+        label="Weekend",
+        ax=ax,
+        fill=True,
+        alpha=0.15,
+    )
 
-        # Set labels and title
-        ax.set_title("Density Plot of Demand by Weekday/Weekend", fontsize=14)
-        ax.set_xlabel("Demand", fontsize=12)
-        ax.legend(fontsize=12)
+    # Set labels and title
+    ax.set_title("Density Plot of Demand by Weekday/Weekend", fontsize=14)
+    ax.set_xlabel("Demand", fontsize=12)
+    ax.legend(fontsize=12)
 
-        for i in ax.get_xticklabels() + ax.get_yticklabels():
-            i.set_fontsize(10)
+    for i in ax.get_xticklabels() + ax.get_yticklabels():
+        i.set_fontsize(10)
 
-        plt.tight_layout()
+    plt.tight_layout()
 
     plt.close(fig)
 
