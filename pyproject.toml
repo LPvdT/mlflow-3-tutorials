@@ -37,6 +37,7 @@ serve_wine_model = "mlflow_3_tutorials.lib.scripts:serve_wine_model"
 deep_learning = "mlflow_3_tutorials.deep_learning_quickstart:main"
 model_registry = "mlflow_3_tutorials.model_registry_quickstart:main"
 optuna_tuning_tracking = "mlflow_3_tutorials.optuna_tuning_tracking:main"
+logging_visualizations = "mlflow_3_tutorials.logging_visualizations:main"
 
 [project.optional-dependencies]
 tensorflow = [
