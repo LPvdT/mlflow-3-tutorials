@@ -13,7 +13,8 @@ from mlflow_3_tutorials.lib.utils import (
     generate_apple_sales_data_with_promo_adjustment,
 )
 
-logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
+# Configure logger
+logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
 
 def main() -> None:
