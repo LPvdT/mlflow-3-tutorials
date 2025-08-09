@@ -692,6 +692,7 @@ def plot_density_weekday_weekend(
 
 def plot_coefficients(
     model: Any,
+    /,
     feature_names: list[str],
     style: Literal["seaborn"] = "seaborn",
     plot_size: tuple[int, int] = (10, 8),
@@ -778,6 +779,7 @@ def plot_residuals(
 def plot_prediction_error(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
+    /,
     style: Literal["seaborn"] = "seaborn",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
@@ -850,6 +852,7 @@ def plot_qq(
 
 def plot_correlation_matrix(
     data: pd.DataFrame,
+    /,
     style: Literal["seaborn"] = "seaborn",
     plot_size: tuple[int, int] = (10, 8),
     save_path: str | None = "figures/corr_plot.png",
