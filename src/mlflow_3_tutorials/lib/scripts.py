@@ -21,7 +21,7 @@ def start_tracking_server() -> None:
 
     url = f"http://{SERVER_ADDRESS}:{SERVER_PORT}"
     run_command(
-        f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT}",
+        f"mlflow-go server --host={SERVER_ADDRESS} --port={SERVER_PORT}",
         f"MLflow tracking server: {url}",
         None,
     )
