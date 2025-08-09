@@ -11,11 +11,12 @@ from sklearn.model_selection import train_test_split
 from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 from mlflow_3_tutorials.lib.utils import as_json
 
-# Configure logger
-logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
 
 def main() -> None:
+    # Configure logger
+    logger.remove()
+    logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
     with mlflow.start_run() as _run:
         X, y = make_regression(  # type: ignore
             n_features=4, n_informative=2, random_state=0, shuffle=False

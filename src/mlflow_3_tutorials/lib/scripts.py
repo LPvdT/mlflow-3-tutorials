@@ -13,23 +13,30 @@ from mlflow_3_tutorials.lib.constants import (
 from mlflow_3_tutorials.lib.runner import run_command
 
 # Configure logger
+logger.remove()
 logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
 
-def start_tracking_server() -> None:
+def start_tracking_server(*, use_go_backend: bool = False) -> None:
     """Start an MLflow tracking server."""
 
     url = f"http://{SERVER_ADDRESS}:{SERVER_PORT}"
-    # run_command(
-    #     "mlflow server "
-    #     f"--host={SERVER_ADDRESS} "
-    #     f"--port={SERVER_PORT} "
-    #     f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-    #     f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-    #     None,
-    # )
+
+    if use_go_backend:
+        # Start the MLflow Go backend server
+        logger.warning(
+            "Is PostgreSQL and accessible at: 'postgresql://postgres:postgres@localhost:5432/postgres'?"
+        )
+        run_command(
+            f"mlflow-go server --host={SERVER_ADDRESS} --port={SERVER_PORT} "
+            f"--backend-store-uri postgresql://postgres:postgres@localhost:5432/postgres "
+            f"MLflow Go tracking server: {url}",
+            None,
+        )
+
     run_command(
-        f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT}",
+        f"mlflow server --host={SERVER_ADDRESS} "
+        f"--port={SERVER_PORT} --backend-store-uri sqlite:///mlflow.db ",
         f"MLflow tracking server: {url}",
         None,
     )

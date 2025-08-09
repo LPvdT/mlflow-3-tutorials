@@ -19,11 +19,12 @@ from mlflow_3_tutorials.lib.dl_utils import (
 )
 from mlflow_3_tutorials.lib.utils import as_json
 
-# Configure logger
-logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
 
 def main() -> None:
+    # Configure logger
+    logger.remove()
+    logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
     # Load Iris dataset and prepare the DataFrame
     iris = load_iris()
     iris_df, _iris_target = (
