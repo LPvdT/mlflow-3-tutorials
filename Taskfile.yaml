@@ -66,7 +66,7 @@ tasks:
 
   mlflow:serve-wine:
     desc: Serve the Wine model
-    vars: {VERSION: 1, SERVE_PORT: 5002}
+    vars: { VERSION: 1, SERVE_PORT: 5002 }
     aliases: [serve]
     cmd: '{{.PY}} serve_wine_model --version={{.VERSION}} --port={{.SERVE_PORT}}'
 
@@ -95,3 +95,8 @@ tasks:
     desc: Optuna hyperparameter tuning + tracking (nested) runs
     aliases: [ot]
     cmd: '{{.PY}} optuna_tuning_tracking'
+
+  proj:logging-visualizations:
+    desc: Logging and visualization of metrics
+    aliases: [lv]
+    cmd: '{{.PY}} logging_visualization'
