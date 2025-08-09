@@ -1,7 +1,6 @@
 import sys
 
 import mlflow
-import mlflow_go_backend
 from loguru import logger
 from mlflow import MlflowClient
 from sklearn.ensemble import RandomForestRegressor
@@ -16,9 +15,8 @@ from mlflow_3_tutorials.lib.utils import (
 
 
 def main() -> None:
-    mlflow_go_backend.enable_go()
-
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     client = MlflowClient(tracking_uri=TRACKING_URI)

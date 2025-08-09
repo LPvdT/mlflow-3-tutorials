@@ -2,7 +2,6 @@ import sys
 
 import mlflow
 import mlflow.sklearn
-import mlflow_go_backend
 from loguru import logger
 from sklearn.datasets import make_regression
 from sklearn.ensemble import RandomForestRegressor
@@ -14,9 +13,8 @@ from mlflow_3_tutorials.lib.utils import as_json
 
 
 def main() -> None:
-    mlflow_go_backend.enable_go()
-
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     with mlflow.start_run() as _run:

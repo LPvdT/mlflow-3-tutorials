@@ -3,7 +3,6 @@ import sys
 from typing import TYPE_CHECKING
 
 import mlflow
-import mlflow_go_backend
 from loguru import logger
 from sklearn import metrics
 from sklearn.linear_model import Ridge
@@ -29,9 +28,8 @@ if TYPE_CHECKING:
 
 
 def main() -> None:
-    mlflow_go_backend.enable_go()
-
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     logger.info("Starting the logging and visualizations demo...")
