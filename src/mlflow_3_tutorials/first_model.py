@@ -1,6 +1,7 @@
 import sys
 
 import mlflow
+import mlflow_go_backend
 from loguru import logger
 from mlflow import MlflowClient
 from sklearn.ensemble import RandomForestRegressor
@@ -13,11 +14,13 @@ from mlflow_3_tutorials.lib.utils import (
     generate_apple_sales_data_with_promo_adjustment,
 )
 
-# Configure logger
-logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
 
 def main() -> None:
+    mlflow_go_backend.enable_go()
+
+    # Configure logger
+    logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
     client = MlflowClient(tracking_uri=TRACKING_URI)
 
     # List all experiments

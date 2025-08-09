@@ -3,6 +3,7 @@ from typing import cast
 
 import mlflow
 import mlflow.pytorch
+import mlflow_go_backend
 import pandas as pd
 import torch
 from loguru import logger
@@ -19,11 +20,13 @@ from mlflow_3_tutorials.lib.dl_utils import (
 )
 from mlflow_3_tutorials.lib.utils import as_json
 
-# Configure logger
-logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
-
 
 def main() -> None:
+    mlflow_go_backend.enable_go()
+
+    # Configure logger
+    logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
     # Load Iris dataset and prepare the DataFrame
     iris = load_iris()
     iris_df, _iris_target = (
