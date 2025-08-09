@@ -533,7 +533,7 @@ def plot_box_weekend(
 
     fig, ax = plt.subplots(figsize=plot_size)
 
-    sns.boxplot(x="weekend", y="demand", data=df, ax=ax, palette="lightgray")
+    sns.boxplot(x="weekend", y="demand", data=df, ax=ax, palette="Set2")
 
     sns.stripplot(
         data=df,
