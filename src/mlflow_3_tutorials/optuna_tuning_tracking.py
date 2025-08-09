@@ -1,5 +1,6 @@
 import functools
 import math
+import sys
 from pathlib import Path
 
 import mlflow
@@ -11,7 +12,7 @@ from mlflow import exceptions
 from optuna.integration.mlflow import MLflowCallback
 from sklearn.model_selection import train_test_split
 
-from mlflow_3_tutorials.lib.constants import TRACKING_URI
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL, TRACKING_URI
 from mlflow_3_tutorials.lib.utils import (
     champion_callback,
     generate_apple_sales_data_with_promo_adjustment,
@@ -21,6 +22,8 @@ from mlflow_3_tutorials.lib.utils import (
     plot_feature_importance,
     plot_residuals_xgboost,
 )
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def main() -> None:
