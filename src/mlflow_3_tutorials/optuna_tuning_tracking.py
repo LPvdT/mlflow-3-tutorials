@@ -19,7 +19,7 @@ from mlflow_3_tutorials.lib.utils import (
     objective,
     plot_correlation_with_demand,
     plot_feature_importance,
-    plot_residuals,
+    plot_residuals_xgboost,
 )
 
 
@@ -123,7 +123,7 @@ def main() -> None:
         )
 
         # Log the residuals plot
-        residuals = plot_residuals(model, dvalid, valid_y)  # type: ignore
+        residuals = plot_residuals_xgboost(model, dvalid, valid_y)  # type: ignore
         mlflow.log_figure(figure=residuals, artifact_file="residuals.png")
 
         artifact_path = "model"
