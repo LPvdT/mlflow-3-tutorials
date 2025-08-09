@@ -20,14 +20,6 @@ def start_tracking_server() -> None:
     """Start an MLflow tracking server."""
 
     url = f"http://{SERVER_ADDRESS}:{SERVER_PORT}"
-    # run_command(
-    #     "mlflow server "
-    #     f"--host={SERVER_ADDRESS} "
-    #     f"--port={SERVER_PORT} "
-    #     f"--default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-    #     f"MLflow tracking server: {url} - default-artifact-root={DEFAULT_ARTIFACT_ROOT}",
-    #     None,
-    # )
     run_command(
         f"mlflow server --host={SERVER_ADDRESS} --port={SERVER_PORT}",
         f"MLflow tracking server: {url}",

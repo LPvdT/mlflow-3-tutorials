@@ -260,6 +260,7 @@ def plot_correlation_with_demand(
 
     # Save the plot if save_path is specified
     if save_path:
+        Path(save_path).parent.mkdir(parents=True, exist_ok=True)
         plt.savefig(save_path, format="png", dpi=600)
 
     plt.close(fig)
