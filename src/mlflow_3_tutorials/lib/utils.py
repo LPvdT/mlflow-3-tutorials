@@ -23,6 +23,7 @@ from sklearn.metrics import mean_squared_error
 from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 
 # Configure logger
+logger.remove()
 logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
 

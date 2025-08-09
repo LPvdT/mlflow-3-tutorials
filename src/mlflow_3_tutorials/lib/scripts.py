@@ -13,6 +13,7 @@ from mlflow_3_tutorials.lib.constants import (
 from mlflow_3_tutorials.lib.runner import run_command
 
 # Configure logger
+logger.remove()
 logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
 
