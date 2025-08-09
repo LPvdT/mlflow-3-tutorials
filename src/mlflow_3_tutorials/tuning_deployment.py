@@ -16,7 +16,9 @@ from sklearn.model_selection import train_test_split
 from mlflow_3_tutorials.lib.constants import LOG_LEVEL, WINE_QUALITY_DATA_URL
 from mlflow_3_tutorials.lib.utils import as_json
 
-logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
+# Configure logger
+logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
+
 
 DType = TypeVar("DType", bound=np.generic)
 
