@@ -1,3 +1,4 @@
+import sys
 from typing import cast
 
 import mlflow
@@ -10,12 +11,15 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from torch import nn
 
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 from mlflow_3_tutorials.lib.dl_utils import (
     IrisClassifier,
     compute_accuracy,
     prepare_data,
 )
 from mlflow_3_tutorials.lib.utils import as_json
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def main() -> None:

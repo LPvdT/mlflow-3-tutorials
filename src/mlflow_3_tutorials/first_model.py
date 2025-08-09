@@ -1,3 +1,5 @@
+import sys
+
 import mlflow
 from loguru import logger
 from mlflow import MlflowClient
@@ -5,11 +7,13 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 
-from mlflow_3_tutorials.lib.constants import TRACKING_URI
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL, TRACKING_URI
 from mlflow_3_tutorials.lib.utils import (
     as_json,
     generate_apple_sales_data_with_promo_adjustment,
 )
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def main() -> None:

@@ -1,3 +1,5 @@
+import sys
+
 import mlflow
 import mlflow.sklearn
 from loguru import logger
@@ -6,7 +8,10 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 from mlflow_3_tutorials.lib.utils import as_json
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def main() -> None:
