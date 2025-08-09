@@ -4,7 +4,6 @@ import sys
 from pathlib import Path
 
 import mlflow
-import mlflow_go_backend
 import optuna
 import psutil
 import xgboost
@@ -26,9 +25,8 @@ from mlflow_3_tutorials.lib.utils import (
 
 
 def main() -> None:
-    mlflow_go_backend.enable_go()
-
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     # Set Optuna logging level

@@ -9,6 +9,7 @@ from mlflow_3_tutorials.lib.utils import as_json
 
 if __name__ == "__main__":
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     # Prepare test data

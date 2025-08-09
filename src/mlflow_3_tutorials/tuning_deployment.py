@@ -5,7 +5,6 @@ from typing import Any, TypeVar, cast
 import keras
 import matplotlib.pyplot as plt
 import mlflow
-import mlflow_go_backend
 import numpy as np
 import pandas as pd
 from hyperopt import STATUS_OK, Trials, fmin, hp, tpe
@@ -23,9 +22,8 @@ from mlflow_3_tutorials.lib.utils import as_json
 
 
 def main() -> None:  # noqa
-    mlflow_go_backend.enable_go()
-
     # Configure logger
+    logger.remove()
     logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
     DType = TypeVar("DType", bound=np.generic)
