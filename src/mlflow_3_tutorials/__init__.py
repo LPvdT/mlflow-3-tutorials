@@ -1,5 +1,4 @@
 import logging
-import sys
 
 from loguru import logger
 
@@ -8,7 +7,6 @@ from mlflow_3_tutorials.lib.utils import InterceptHandler
 
 # Setup Loguru to replace standard logging
 logger.remove()
-logger.add(sys.stderr, level=LOG_LEVEL)
 
 # Redirect standard logging to Loguru
 logging.basicConfig(handlers=[InterceptHandler()], level=LOG_LEVEL)
