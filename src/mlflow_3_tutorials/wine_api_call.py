@@ -1,9 +1,13 @@
 import json
+import sys
 
 import requests
 from loguru import logger
 
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 from mlflow_3_tutorials.lib.utils import as_json
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 # Prepare test data
 test_wine = {

@@ -1,7 +1,12 @@
 import shlex
 import subprocess
+import sys
 
 from loguru import logger
+
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def run_command(

@@ -6,10 +6,13 @@ from loguru import logger
 
 from mlflow_3_tutorials.lib.constants import (
     DEFAULT_ARTIFACT_ROOT,
+    LOG_LEVEL,
     SERVER_ADDRESS,
     SERVER_PORT,
 )
 from mlflow_3_tutorials.lib.runner import run_command
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 def start_tracking_server() -> None:

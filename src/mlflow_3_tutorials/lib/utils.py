@@ -1,8 +1,10 @@
 import json
 import logging
 import math
+import sys
 from datetime import datetime
-from typing import Any
+from pathlib import Path
+from typing import Any, Literal
 
 import matplotlib.pyplot as plt
 import mlflow
@@ -15,7 +17,12 @@ import xgboost
 from loguru import logger
 from matplotlib.figure import Figure
 from optuna.integration import XGBoostPruningCallback
+from scipy import stats
 from sklearn.metrics import mean_squared_error
+
+from mlflow_3_tutorials.lib.constants import LOG_LEVEL
+
+logger.bind(name="runner").add(sys.stderr, level=LOG_LEVEL)
 
 
 # ruff: noqa: PLR6301
@@ -259,7 +266,7 @@ def plot_correlation_with_demand(
     return fig
 
 
-def plot_residuals(
+def plot_residuals_xgboost(
     model: xgboost.core.Booster,
     dvalid: xgboost.core.DMatrix,
     valid_y: pd.Series,
@@ -367,7 +374,6 @@ def champion_callback(
     Logging callback that will report when a new trial iteration improves upon existing
     best trial values.
 
-    Note
     ---
 
     This callback is not intended for use in distributed computing systems such as Spark
@@ -442,3 +448,465 @@ def objective(trial: optuna.trial.Trial, **kwargs: dict) -> float:
         mlflow.log_metric("rmse", math.sqrt(error))
 
     return error
+
+
+def plot_time_series_demand(
+    data: pd.DataFrame,
+    /,
+    window_size: int = 7,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (16, 12),
+) -> Figure:
+    """
+    Plots a time series graph of demand with an optional rolling average overlay.
+
+    Args:
+        - data (pd.DataFrame): DataFrame containing the time series data with a 'date' and 'demand' column.
+        - window_size (int, optional): The window size for calculating the rolling average. Default is 7.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (16, 12).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the plot.
+    """
+
+    df = data.copy()
+
+    df["date"] = pd.to_datetime(df["date"])
+
+    # Calculate the rolling average
+    df["rolling_avg"] = df["demand"].rolling(window=window_size).mean()
+
+    with plt.style.context(style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        # Plot the original time series data with low alpha (transparency)
+        ax.plot(
+            df["date"], df["demand"], "b-o", label="Original Demand", alpha=0.15
+        )
+
+        # Plot the rolling average
+        ax.plot(
+            df["date"],
+            df["rolling_avg"],
+            label=f"{window_size}-Day Rolling Average",
+            color="orange",
+            linewidth=2,
+        )
+
+        # Set labels and title
+        ax.set_title(
+            f"Time Series Plot of Demand with {window_size} day Rolling Average",
+            fontsize=14,
+        )
+        ax.set_xlabel("Date", fontsize=12)
+        ax.set_ylabel("Demand", fontsize=12)
+
+        # Add legend to explain the lines
+        ax.legend()
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_box_weekend(
+    data: pd.DataFrame,
+    /,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a box plot of demand by weekend status.
+
+    Args:
+        - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'weekend' columns.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (16, 12).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the box plot.
+    """
+
+    df = data.copy()
+
+    with plt.style.context(style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        sns.boxplot(
+            x="weekend", y="demand", data=df, ax=ax, palette="lightgray"
+        )
+
+        sns.stripplot(
+            data=df,
+            x="weekend",
+            y="demand",
+            ax=ax,
+            hue="weekend",
+            palette={0: "blue", 1: "green"},
+            alpha=0.15,
+            jitter=0.3,
+            size=5,
+        )
+
+        # Set labels and title
+        ax.set_title("Box Plot of Demand on Weekends vs. Weekdays", fontsize=14)
+        ax.set_xlabel("Weekend (0: No, 1: Yes)", fontsize=12)
+        ax.set_ylabel("Demand", fontsize=12)
+
+        for i in ax.get_xticklabels() + ax.get_yticklabels():
+            i.set_fontsize(10)
+
+        ax.legend_.remove()  # type: ignore
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_scatter_demand_price(
+    data: pd.DataFrame,
+    /,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a scatter plot of demand against price per kg.
+
+    Args:
+        - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'price_per_kg' columns.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the scatter plot.
+    """
+
+    df = data.copy()
+
+    with plt.style.context(style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        # Scatter plot with jitter, transparency, and color-coded based on weekend
+        sns.scatterplot(
+            data=df,
+            x="price_per_kg",
+            y="demand",
+            hue="weekend",
+            palette={0: "blue", 1: "green"},
+            alpha=0.15,
+            ax=ax,
+        )
+
+        # Fit a simple regression line for each subgroup
+        sns.regplot(
+            data=df[df["weekend"] == 0],  # type: ignore
+            x="price_per_kg",
+            y="demand",
+            scatter=False,
+            color="blue",
+            ax=ax,
+        )
+
+        sns.regplot(
+            data=df[df["weekend"] == 1],  # type: ignore
+            x="price_per_kg",
+            y="demand",
+            scatter=False,
+            color="green",
+            ax=ax,
+        )
+
+        # Set labels and title
+        ax.set_title(
+            "Scatter Plot of Demand vs Price per kg with Regression Line",
+            fontsize=14,
+        )
+        ax.set_xlabel("Price per kg", fontsize=12)
+        ax.set_ylabel("Demand", fontsize=12)
+
+        for i in ax.get_xticklabels() + ax.get_yticklabels():
+            i.set_fontsize(10)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_density_weekday_weekend(
+    data: pd.DataFrame,
+    /,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a density plot of demand by weekday and weekend.
+
+    Args:
+        - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'weekend' columns.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the density plot.
+    """
+
+    df = data.copy()
+
+    with plt.style.context(style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        # Plot density for weekdays
+        sns.kdeplot(
+            df[df["weekend"] == 0]["demand"],  # type: ignore
+            color="blue",
+            label="Weekday",
+            ax=ax,
+            fill=True,
+            alpha=0.15,
+        )
+
+        # Plot density for weekends
+        sns.kdeplot(
+            df[df["weekend"] == 1]["demand"],  # type: ignore
+            color="green",
+            label="Weekend",
+            ax=ax,
+            fill=True,
+            alpha=0.15,
+        )
+
+        # Set labels and title
+        ax.set_title("Density Plot of Demand by Weekday/Weekend", fontsize=14)
+        ax.set_xlabel("Demand", fontsize=12)
+        ax.legend(fontsize=12)
+
+        for i in ax.get_xticklabels() + ax.get_yticklabels():
+            i.set_fontsize(10)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_coefficients(
+    model: Any,
+    /,
+    feature_names: list[str],
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a bar plot of the coefficients of a model against their feature names.
+
+    Args:
+        - model (Any): A model object with a coef_ attribute.
+        - feature_names (list[str]): A list of feature names corresponding to the coefficients in `model.coef_`.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the bar plot.
+    """
+
+    with plt.style.context(style=style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        ax.barh(feature_names, model.coef_)
+
+        # Set labels and title
+        ax.set_title("Coefficient Plot", fontsize=14)
+        ax.set_xlabel("Coefficient Value", fontsize=12)
+        ax.set_ylabel("Features", fontsize=12)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_residuals(
+    y_test: pd.Series | np.ndarray,
+    y_pred: pd.Series | np.ndarray,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a residual plot of the model's predictions against their residuals.
+
+    Args:
+        - y_test (pd.Series | np.ndarray): The true values of the test set.
+        - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the residual plot.
+    """
+
+    residuals = y_test - y_pred
+
+    with plt.style.context(style=style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        sns.residplot(
+            x=y_pred,
+            y=residuals,
+            lowess=True,
+            ax=ax,
+            line_kws={"color": "red", "lw": 1},
+        )
+
+        ax.axhline(y=0, color="black", linestyle="--")
+
+        # Set labels and title
+        ax.set_title("Residual Plot", fontsize=14)
+        ax.set_xlabel("Predicted values", fontsize=12)
+        ax.set_ylabel("Residuals", fontsize=12)
+
+        for label in ax.get_xticklabels() + ax.get_yticklabels():
+            label.set_fontsize(10)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_prediction_error(
+    y_test: pd.Series | np.ndarray,
+    y_pred: pd.Series | np.ndarray,
+    /,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a prediction error plot of the model's predictions against their true values.
+
+    Args:
+        - y_test (pd.Series | np.ndarray): The true values of the test set.
+        - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the prediction error plot.
+    """
+
+    with plt.style.context(style=style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        ax.scatter(y_pred, y_test - y_pred)
+        ax.axhline(y=0, color="red", linestyle="--")
+
+        # Set labels and title
+        ax.set_title("Prediction Error Plot", fontsize=14)
+        ax.set_xlabel("Predicted Values", fontsize=12)
+        ax.set_ylabel("Errors", fontsize=12)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_qq(
+    y_test: pd.Series | np.ndarray,
+    y_pred: pd.Series | np.ndarray,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+) -> Figure:
+    """
+    Plots a Q-Q plot to compare the distribution of residuals against a normal distribution.
+
+    Args:
+        - y_test (pd.Series | np.ndarray): The true values of the test set.
+        - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the Q-Q plot.
+    """
+
+    residuals = y_test - y_pred
+
+    with plt.style.context(style=style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        stats.probplot(residuals, dist="norm", plot=ax)
+
+        # Set title
+        ax.set_title("QQ Plot", fontsize=14)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    return fig
+
+
+def plot_correlation_matrix(
+    data: pd.DataFrame,
+    /,
+    style: Literal["seaborn"] = "seaborn",
+    plot_size: tuple[int, int] = (10, 8),
+    save_path: str | None = "figures/corr_plot.png",
+) -> Figure:
+    """
+    Plots a heatmap of the correlation matrix of the DataFrame.
+
+    Args:
+        - data (pd.DataFrame): DataFrame containing the data to compute correlations.
+        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
+
+    Returns:
+        - Figure: A Matplotlib Figure object containing the heatmap.
+    """
+
+    with plt.style.context(style=style):
+        fig, ax = plt.subplots(figsize=plot_size)
+
+        # Calculate the correlation matrix
+        corr = data.corr()
+
+        # Generate a mask for the upper triangle
+        mask = np.triu(np.ones_like(corr, dtype=bool))
+
+        # Draw the heatmap with the mask and correct aspect ratio
+        sns.heatmap(
+            corr,
+            mask=mask,
+            cmap="coolwarm",
+            vmax=0.3,
+            center=0,
+            square=True,
+            linewidths=0.5,
+            annot=True,
+            fmt=".2f",
+        )
+
+        # Set title
+        ax.set_title("Feature Correlation Matrix", fontsize=14)
+
+        plt.tight_layout()
+
+    plt.close(fig)
+
+    # Save the figure if a save_path is provided
+    if isinstance(save_path, str) and save_path:
+        path = Path(save_path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        fig.savefig(path)
+
+    return fig
