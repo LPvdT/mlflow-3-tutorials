@@ -95,3 +95,8 @@ tasks:
     desc: Optuna hyperparameter tuning + tracking (nested) runs
     aliases: [ot]
     cmd: '{{.PY}} optuna_tuning_tracking'
+
+  proj:logging-visualizations:
+    desc: Logging and visualization of metrics
+    aliases: [lv]
+    cmd: '{{.PY}} logging_visualizations'
