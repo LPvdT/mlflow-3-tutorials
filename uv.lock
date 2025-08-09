@@ -2281,7 +2281,6 @@ dependencies = [
     { name = "hyperopt" },
     { name = "loguru" },
     { name = "mlflow" },
-    { name = "mlflow-go-backend" },
     { name = "more-itertools" },
     { name = "optuna" },
     { name = "optuna-integration" },
@@ -2295,6 +2294,9 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
+go-backend = [
+    { name = "mlflow-go-backend" },
+]
 mlflow-extras = [
     { name = "mlflow", extra = ["extras"] },
 ]
@@ -2333,7 +2335,7 @@ requires-dist = [
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mlflow", specifier = ">=3.1.1" },
     { name = "mlflow", extras = ["extras"], marker = "extra == 'mlflow-extras'", specifier = ">=3.1.1" },
-    { name = "mlflow-go-backend", specifier = ">=0.2.2" },
+    { name = "mlflow-go-backend", marker = "extra == 'go-backend'", specifier = ">=0.2.2" },
     { name = "more-itertools", specifier = ">=10.7.0" },
     { name = "optuna", specifier = ">=4.4.0" },
     { name = "optuna-integration", specifier = ">=4.4.0" },
@@ -2348,7 +2350,7 @@ requires-dist = [
     { name = "torchvision", marker = "extra == 'pytorch'", specifier = ">=0.22.1" },
     { name = "xgboost", specifier = ">=3.0.2" },
 ]
-provides-extras = ["tensorflow", "mlflow-extras", "pytorch"]
+provides-extras = ["tensorflow", "mlflow-extras", "pytorch", "go-backend"]
 
 [package.metadata.requires-dev]
 dev = [
