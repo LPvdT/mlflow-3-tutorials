@@ -25,6 +25,9 @@ from mlflow_3_tutorials.lib.constants import LOG_LEVEL
 # Configure logger
 logger.bind(name=__file__).add(sys.stderr, level=LOG_LEVEL)
 
+# Set the default style for seaborn plots
+sns.set_style("whitegrid")
+
 
 # ruff: noqa: PLR6301
 class InterceptHandler(logging.Handler):
@@ -455,7 +458,7 @@ def plot_time_series_demand(
     data: pd.DataFrame,
     /,
     window_size: int = 7,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (16, 12),
 ) -> Figure:
     """
@@ -464,7 +467,7 @@ def plot_time_series_demand(
     Args:
         - data (pd.DataFrame): DataFrame containing the time series data with a 'date' and 'demand' column.
         - window_size (int, optional): The window size for calculating the rolling average. Default is 7.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (16, 12).
 
     Returns:
@@ -515,7 +518,7 @@ def plot_time_series_demand(
 def plot_box_weekend(
     data: pd.DataFrame,
     /,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -523,7 +526,7 @@ def plot_box_weekend(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'weekend' columns.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (16, 12).
 
     Returns:
@@ -570,7 +573,7 @@ def plot_box_weekend(
 def plot_scatter_demand_price(
     data: pd.DataFrame,
     /,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -578,7 +581,7 @@ def plot_scatter_demand_price(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'price_per_kg' columns.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -641,7 +644,7 @@ def plot_scatter_demand_price(
 def plot_density_weekday_weekend(
     data: pd.DataFrame,
     /,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -649,7 +652,7 @@ def plot_density_weekday_weekend(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the time series data with 'demand' and 'weekend' columns.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -700,7 +703,7 @@ def plot_coefficients(
     model: Any,
     /,
     feature_names: list[str],
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -709,7 +712,7 @@ def plot_coefficients(
     Args:
         - model (Any): A model object with a coef_ attribute.
         - feature_names (list[str]): A list of feature names corresponding to the coefficients in `model.coef_`.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -736,7 +739,7 @@ def plot_coefficients(
 def plot_residuals(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -745,7 +748,7 @@ def plot_residuals(
     Args:
         - y_test (pd.Series | np.ndarray): The true values of the test set.
         - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -786,7 +789,7 @@ def plot_prediction_error(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
     /,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -795,7 +798,7 @@ def plot_prediction_error(
     Args:
         - y_test (pd.Series | np.ndarray): The true values of the test set.
         - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -823,7 +826,7 @@ def plot_prediction_error(
 def plot_qq(
     y_test: pd.Series | np.ndarray,
     y_pred: pd.Series | np.ndarray,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
 ) -> Figure:
     """
@@ -832,7 +835,7 @@ def plot_qq(
     Args:
         - y_test (pd.Series | np.ndarray): The true values of the test set.
         - y_pred (pd.Series | np.ndarray): The predicted values of the test set.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
@@ -859,7 +862,7 @@ def plot_qq(
 def plot_correlation_matrix(
     data: pd.DataFrame,
     /,
-    style: Literal["seaborn"] = "seaborn",
+    style: Literal["whitegrid", "darkgrid"] = "whitegrid",
     plot_size: tuple[int, int] = (10, 8),
     save_path: str | None = "figures/corr_plot.png",
 ) -> Figure:
@@ -868,7 +871,7 @@ def plot_correlation_matrix(
 
     Args:
         - data (pd.DataFrame): DataFrame containing the data to compute correlations.
-        - style (Literal["seaborn"], optional): The style to use for plotting. Default is "seaborn".
+        - style (Literal["whitegrid", "darkgrid"], optional): The style to use for plotting. Default is "whitegrid".
         - plot_size (tuple[int, int], optional): The size of the plot. Default is (10, 8).
 
     Returns:
