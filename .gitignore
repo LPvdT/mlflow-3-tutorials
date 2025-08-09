@@ -24,4 +24,5 @@ mlartifacts/
 mlflow.db
 
 # Artifacts
+figures/
 *.png
