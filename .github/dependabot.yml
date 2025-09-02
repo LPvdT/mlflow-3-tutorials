@@ -5,8 +5,8 @@ updates:
     directory: /
     schedule:
       interval: weekly
-      day: saturday
-      time: "06:00"
+      day: wednesday
+      time: "07:00"
       timezone: Europe/Amsterdam
     target-branch: main
     pull-request-branch-name:
@@ -15,7 +15,5 @@ updates:
       include: scope
       prefix: "deps(uv)"
     labels: ["dependencies", "uv"]
-    cooldown:
-      default-days: 5
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 3
     versioning-strategy: lockfile-only
