@@ -15,5 +15,5 @@ updates:
       include: scope
       prefix: "deps(uv)"
     labels: ["dependencies", "uv"]
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 10
     versioning-strategy: lockfile-only
