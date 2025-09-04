@@ -7,6 +7,8 @@ updates:
       interval: weekly
       day: saturday
       timezone: Europe/Amsterdam
+    cooldown:
+      default-days: 1
     target-branch: main
     pull-request-branch-name:
       separator: /
