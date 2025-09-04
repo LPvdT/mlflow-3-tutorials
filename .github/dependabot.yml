@@ -5,15 +5,14 @@ updates:
     directory: /
     schedule:
       interval: weekly
-      day: wednesday
-      time: "07:00"
+      day: saturday
       timezone: Europe/Amsterdam
     target-branch: main
     pull-request-branch-name:
       separator: /
     commit-message:
       include: scope
-      prefix: "deps(uv)"
-    labels: ["dependencies", "uv"]
+      prefix: deps(uv)
+    labels: [dependencies, uv]
     open-pull-requests-limit: 10
     versioning-strategy: lockfile-only
