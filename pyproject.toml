@@ -22,6 +22,7 @@ dependencies = [
     "seaborn>=0.13.2",
     "statsmodels>=0.14.5",
     "xgboost>=3.0.2",
+    "basedpyright>=1.31.0",
 ]
 
 [project.scripts]
@@ -109,41 +110,22 @@ ignore = [
 ]
 
 extend-ignore = [
-    # pycodestyle
-    "E501",
-
+    "E501", # pycodestyle
     # bandit
     "S603",
     "S607",
     "S404",
-
-    # flake8-builtins
-    "B008",
-
-    # pep8-naming
-    "N806",
-
+    "B008", # flake8-builtins
+    "N806", # pep8-naming
     # ruff plugins hygiene
     "PGH003",
     "PGH004",
-
-    # flake8-refactor
-    "PLR0914",
-
-    # fixme-style TODO
-    "FIX002",
-
-    # trailing comma
-    "COM812",
-
-    # Argument name should be lowercase
-    "N803",
-
-    # Found commented-out code
-    "ERA001",
-
-    # Dynamically typed expressions (typing.Any) are disallowed
-    "ANN401",
+    "PLR0914", # flake8-refactor
+    "FIX002",  # fixme-style TODO
+    "COM812",  # trailing comma
+    "N803",    # Argument name should be lowercase
+    "ERA001",  # Found commented-out code
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed
 ]
 
 fixable = [
