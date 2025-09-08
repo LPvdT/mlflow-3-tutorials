@@ -4,8 +4,8 @@ updates:
   - package-ecosystem: uv
     directory: /
     schedule:
-      interval: weekly
-      day: saturday
+      interval: daily
+      time: "20:00"
       timezone: Europe/Amsterdam
     target-branch: main
     pull-request-branch-name:
