@@ -34,3 +34,4 @@ repos:
       - id: yamlfix
         name: YAML fix
         args: [--config-file=pyproject.toml]
+        stages: [manual]
