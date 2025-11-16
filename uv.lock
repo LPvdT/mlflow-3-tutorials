@@ -2626,14 +2626,14 @@ wheels = [
 
 [[package]]
 name = "optuna-integration"
-version = "4.5.0"
+version = "4.6.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "optuna" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/99/7828608f7b2612500f81b332f6d36e15b02d9999e9d03e614ffe32904bf2/optuna_integration-4.5.0.tar.gz", hash = "sha256:e0b917830dd10de63e5f288c3932e1b20f120bae640cb28fbf63fbbedb970e7d", size = 86492, upload-time = "2025-08-18T06:36:58.247Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8a/88/205035ee7e17f628d64a9f4e1efbb2e8aa04141e89a89d6596352eae0bec/optuna_integration-4.6.0.tar.gz", hash = "sha256:fe563b21131656df35d19c05507893fc8cfa596866476225129021556496a09a", size = 86538, upload-time = "2025-11-10T05:27:09.556Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7e/3a/af425cfd30aede975cae592285bccf384f0dbd6bd4a0a817ef362cb4fe5d/optuna_integration-4.5.0-py3-none-any.whl", hash = "sha256:88a15aa7cc3020f2d58cb321d83f9fbf7c641a752e81a5b595aaa0f9d2c4e0df", size = 99113, upload-time = "2025-08-18T06:36:56.954Z" },
+    { url = "https://files.pythonhosted.org/packages/6a/86/7cdb7d23dfa2aec23ba63d51839e520489424a9ed7ded79e6c0e40783bf7/optuna_integration-4.6.0-py3-none-any.whl", hash = "sha256:a02ef2018c02d521d23e364110579c03e53a518894d9b9a76b246b5fb2e027fd", size = 99106, upload-time = "2025-11-10T05:27:07.901Z" },
 ]
 
 [[package]]
