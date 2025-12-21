@@ -4096,7 +4096,7 @@ wheels = [
 
 [[package]]
 name = "yamlfix"
-version = "1.19.0"
+version = "1.19.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "click" },
@@ -4104,9 +4104,9 @@ dependencies = [
     { name = "pydantic" },
     { name = "ruyaml" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e8/5f/cea9f9a9027f3f7ac6b5345e654255518013e94d5c3146746a139be5c865/yamlfix-1.19.0.tar.gz", hash = "sha256:22f95ed2a5b88f46f06cf7922c616b6706d3596f23a0553138796ab909e5fa96", size = 39456, upload-time = "2025-10-12T21:03:21.571Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/93/1d/b60d4411ff495de9b7598cc041e29c661e8e2f9d476a8a09bad1f54c1bce/yamlfix-1.19.1.tar.gz", hash = "sha256:05f6add13959637564f278e9237f6e201ff75e061a0a4cb9fc06fa95c3001a22", size = 39483, upload-time = "2025-12-18T09:57:23.179Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6a/76/3b3885dec289687017d662a602b5a7ae912f54e60150182de3eddb10c45f/yamlfix-1.19.0-py3-none-any.whl", hash = "sha256:9170a34bed093b8b45639e01fd05a1ded6886cb07dc43c174c061e15a6414bc8", size = 28378, upload-time = "2025-10-12T21:03:18.945Z" },
+    { url = "https://files.pythonhosted.org/packages/30/c7/cba5941b7066f59dbddfe88bdc7154edbe5119bacb3814599997fbc2acac/yamlfix-1.19.1-py3-none-any.whl", hash = "sha256:b885fcf171a2eb59df83c219355bb17dd147675645e2756754372c0bd0b80ea5", size = 28393, upload-time = "2025-12-18T09:57:21.547Z" },
 ]
 
 [[package]]
