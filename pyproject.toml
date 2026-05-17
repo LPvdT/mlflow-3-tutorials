@@ -62,7 +62,7 @@ go_backend = [
 
 [dependency-groups]
 dev = [
-    "basedpyright>=1.39.3",
+    "basedpyright>=1.39.4",
     "ipykernel>=6.29.5",
     "ipywidgets>=8.1.7",
     "mccabe>=0.7.0",
