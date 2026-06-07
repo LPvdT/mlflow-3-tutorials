@@ -69,7 +69,7 @@ dev = [
     "notebook>=7.5.6",
     "pre-commit>=4.6.0",
     "pyment>=0.3.3",
-    "ruff>=0.15.15",
+    "ruff>=0.15.16",
     "yamlfix>=1.17.0",
 ]
 
