@@ -2144,7 +2144,7 @@ requires-dist = [
     { name = "keras", marker = "extra == 'tensorflow'", specifier = ">=3.14.1" },
     { name = "loguru", specifier = ">=0.7.3" },
     { name = "mlflow", specifier = ">=3.14.0" },
-    { name = "mlflow", extras = ["extras"], marker = "extra == 'mlflow-extras'", specifier = ">=3.13.0" },
+    { name = "mlflow", extras = ["extras"], marker = "extra == 'mlflow-extras'", specifier = ">=3.14.0" },
     { name = "mlflow-go-backend", marker = "extra == 'go-backend'", specifier = ">=0.2.2" },
     { name = "more-itertools", specifier = ">=11.1.0" },
     { name = "optuna", specifier = ">=4.9.0" },
